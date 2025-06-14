@@ -1,6 +1,6 @@
 {
     "name": "atarashi",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "description": "Accelerate your development with pre-made templates for frontend and backend projects.",
     "main": "src/app.js",
     "type": "module",
