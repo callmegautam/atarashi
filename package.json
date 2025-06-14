@@ -1,0 +1,22 @@
+{
+    "name": "atarashi",
+    "version": "0.2.1",
+    "description": "Accelerate your development with pre-made templates for frontend and backend projects.",
+    "main": "src/app.js",
+    "type": "module",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "bin": {
+        "atarashi": "src/app.js"
+    },
+    "keywords": [
+        "atarashi",
+        "cli"
+    ],
+    "author": "Gautam Suthar <iamgautamsuthar@outlook.com> (https://www.github.com/callmegautam)",
+    "license": "MIT",
+    "dependencies": {
+        "inquirer": "^9.2.17"
+    }
+}
