@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "checkJs": true,
+        "target": "ESNext",
+        "module": "ESNext",
+        "rootDir": "./",
+        "outDir": "./dist",
+        "esModuleInterop": true,
+        "strict": true,
+        "moduleResolution": "node",
+        "skipLibCheck": true,
+        "paths": {
+            "@/*": ["./src/*"],
+            "$/*": ["./*"]
+        }
+    },
+    "exclude": ["node_modules"],
+    "include": ["src/**/*.ts", "drizzle.config.ts"],
+    "tsc-alias": {
+        "resolveFullPaths": true,
+        "verbose": true
+    }
+}
