@@ -2,11 +2,11 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-import env from "./config/env";
-import globalErrorHandler from "./middlewares/error-handler.middleware";
+import env from "@/config/env";
+import globalErrorHandler from "@/middlewares/error-handler.middleware";
 
 // Importing routes
-import atarashiRoutes from "./routes/index.routes";
+import atarashiRoutes from "@/routes/index.routes";
 
 const app = express();
 

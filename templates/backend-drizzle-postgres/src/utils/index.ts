@@ -1,4 +1,4 @@
-import asyncHandler from "./asyncHandler";
-import { decodeToken, generateToken, verifyToken } from "./jwt";
+import asyncHandler from "@/utils/asyncHandler";
+import { decodeToken, generateToken, verifyToken } from "@/utils/jwt";
 
 export { asyncHandler, decodeToken, generateToken, verifyToken };
