@@ -6,8 +6,7 @@
     "scripts": {
         "dev": "tsx --watch -r dotenv/config src/index.ts",
         "start": "tsx -r dotenv/config src/index.ts",
-        "build": "tsc",
-        "db:push": "drizzle-kit push"
+        "build": "tsc"
     },
     "keywords": [],
     "author": "Gautam Suthar <iamgautamsuthar@outlook.com> (https://github.com/callmegautam)",
