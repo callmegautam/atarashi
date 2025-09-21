@@ -20,3 +20,10 @@ export type ApiResponse<T> = {
     data?: T;
     error?: string;
 };
+
+export interface AuthRequest extends Request {
+    user?: {
+        id: number;
+        username: string;
+    };
+}

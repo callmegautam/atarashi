@@ -54,8 +54,6 @@ A backend boilerplate using **Express**, **Drizzle ORM**, and **PostgreSQL**.
 📁 backend-drizzle-mysql
 ├── 📁 public/
 ├── 📁 src/
-│   ├── app.ts
-│   ├── index.ts
 │   ├── 📁 config/
 │   │   ├── cookies.ts
 │   │   └── env.ts
@@ -65,17 +63,21 @@ A backend boilerplate using **Express**, **Drizzle ORM**, and **PostgreSQL**.
 │   │   ├── index.ts
 │   │   └── schema.ts
 │   ├── 📁 middlewares/
+│   │   ├── auth.ts
 │   │   └── error-handler.ts
 │   ├── 📁 routes/
 │   │   └── index.ts
+│   ├── 📁 types/
+│   │   ├── types.ts
+│   │   └── schema.ts
 │   ├── 📁 utils/
 │   │   ├── async-handler.ts
 │   │   ├── index.ts
+│   │   ├── cookie.ts
 │   │   ├── response.ts
 │   │   └── jwt.ts
-│   └── 📁 types/
-│       ├── types.ts
-│       └── schema.ts
+│   ├── app.ts
+│   ├── index.ts
 │
 ├── .dockerignore
 ├── .env.sample
