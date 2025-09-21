@@ -1,7 +1,8 @@
+import { NodeEnv } from "@/types/types";
 import { z } from "zod";
 
 const schema = z.object({
-    NODE_ENV: z.enum(["DEVELOPMENT", "PRODUCTION"]).default("DEVELOPMENT"),
+    NODE_ENV: z.nativeEnum(NodeEnv).default(NodeEnv.DEVELOPMENT),
     PORT: z.coerce.number().default(3000),
     CORS_ORIGIN: z.string(),
     DB_URL: z.string(),

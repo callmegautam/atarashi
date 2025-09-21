@@ -65,13 +65,18 @@ A backend boilerplate using **Express**, **Drizzle ORM**, and **PostgreSQL**.
 │   │   ├── index.ts
 │   │   └── schema.ts
 │   ├── 📁 middlewares/
-│   │   └── errorHandler.ts
+│   │   └── error-handler.ts
 │   ├── 📁 routes/
-│   │   └── index.routes.ts
-│   └── 📁 utils/
-│       ├── asyncHandler.ts
-│       ├── index.ts
-│       └── jwt.ts
+│   │   └── index.ts
+│   ├── 📁 utils/
+│   │   ├── async-handler.ts
+│   │   ├── index.ts
+│   │   ├── response.ts
+│   │   └── jwt.ts
+│   └── 📁 types/
+│       ├── types.ts
+│       └── schema.ts
+│
 ├── .dockerignore
 ├── .env.sample
 ├── .gitignore

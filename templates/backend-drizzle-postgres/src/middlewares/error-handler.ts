@@ -1,11 +1,13 @@
 import type { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
+import env from "@/config/env";
+import { NodeEnv } from "@/types/types";
 
 const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
     const statusCode = err.statusCode || 500;
-    const env = process.env.NODE_ENV || "DEVELOPMENT";
+    const node_env = env.NODE_ENV || NodeEnv.DEVELOPMENT;
 
-    if (env !== "PRODUCTION") {
+    if (node_env !== NodeEnv.PRODUCTION) {
         console.error(err.stack || err);
     }
 
@@ -13,10 +15,7 @@ const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFun
         return res.status(400).json({
             success: false,
             message: "Validation Error",
-            data: err.errors.map((e) => ({
-                path: e.path.join("."),
-                message: e.message,
-            })),
+            data: err.message,
         });
     }
 
@@ -28,10 +27,10 @@ const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFun
         });
     }
 
-    return res.status(500).json({
+    res.status(500).json({
         success: false,
         message: "Internal Server Error",
-        data: null,
+        data: err,
     });
 };
 

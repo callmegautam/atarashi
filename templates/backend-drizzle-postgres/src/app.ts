@@ -3,14 +3,16 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import env from "@/config/env";
-import globalErrorHandler from "@/middlewares/errorHandler";
+import globalErrorHandler from "@/middlewares/error-handler";
+import { HttpStatus, NodeEnv } from "./types/types";
 
 // Importing routes
-import atarashiRoutes from "@/routes/index.routes";
+import atarashiRoutes from "@/routes";
+import { sendSuccess } from "./utils";
 
 const app = express();
 
-const isProduction = env.NODE_ENV === "PRODUCTION";
+const isProduction = env.NODE_ENV === NodeEnv.PRODUCTION;
 
 app.use(
     cors({
@@ -25,14 +27,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.get("/", async (_: Request, res: Response) => {
-    return res.status(200).json({
-        success: true,
-        message: "Atarashi Backend",
-        data: null,
-    });
+    return sendSuccess(res, "Atarashi is running", HttpStatus.OK);
 });
 
-app.use("/api/v1/", atarashiRoutes);
+app.use("/api/", atarashiRoutes);
 
 app.use("*", (_: Request, res: Response) => {
     return res.status(404).json({

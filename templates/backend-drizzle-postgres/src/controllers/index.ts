@@ -1,10 +1,7 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "@/utils/index";
+import { asyncHandler, sendSuccess } from "@/utils/index";
+import { HttpStatus } from "@/types/types";
 
 export const atarashi = asyncHandler(async (req: Request, res: Response) => {
-    return res.status(200).json({
-        success: true,
-        message: "Atarashi Backend",
-        data: null,
-    });
+    return sendSuccess(res, "hello", HttpStatus.OK);
 });
