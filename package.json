@@ -1,28 +1,32 @@
 {
-    "name": "atarashi",
-    "version": "0.4.0",
-    "description": "Accelerate your development with pre-made templates for frontend and backend projects.",
-    "main": "src/app.js",
-    "type": "module",
-    "licenses": [
-        {
-            "type": "MIT",
-            "url": "https://github.com/callmegautam/atarashi/blob/main/LICENSE"
-        }
-    ],
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "bin": {
-        "atarashi": "src/app.js"
-    },
-    "keywords": [
-        "atarashi",
-        "cli"
-    ],
-    "author": "Gautam Suthar <iamgautamsuthar@outlook.com> (https://www.github.com/callmegautam)",
-    "license": "MIT",
-    "dependencies": {
-        "inquirer": "^9.2.17"
+  "name": "atarashi",
+  "version": "0.4.0",
+  "description": "Accelerate your development with pre-made templates for frontend and backend projects.",
+  "main": "src/app.js",
+  "type": "module",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/callmegautam/atarashi/blob/main/LICENSE"
     }
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "atarashi": "src/app.js"
+  },
+  "keywords": [
+    "atarashi",
+    "cli"
+  ],
+  "author": "Gautam Suthar <iamgautamsuthar@outlook.com> (https://www.github.com/callmegautam)",
+  "license": "MIT",
+  "dependencies": {
+    "inquirer": "^9.2.17"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/callmegautam/hookstack.git"
+  }
 }
