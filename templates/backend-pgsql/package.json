@@ -1,0 +1,46 @@
+{
+  "name": "configs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.ts",
+  "scripts": {
+    "setup": "pnpm install && pnpm add -D eslint prettier eslint-config-prettier eslint-plugin-prettier @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint-plugin-import eslint-plugin-node",
+    "lint": "eslint 'src/**' --fix",
+    "format": "prettier --write \"**/*.{ts,js,json,md}\"",
+    "dev": "tsx -r dotenv/config src/index.ts",
+    "start": "tsx -r dotenv/config src/index.ts",
+    "build": "tsc",
+    "db:push": "drizzle-kit push"
+  },
+  "keywords": [],
+  "author": "Gautam Suthar <iamgautamsuthar@outlook.com> (https://github.com/callmegautam)",
+  "license": "ISC",
+  "packageManager": "pnpm@10.11.1",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "drizzle-orm": "^0.42.0",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.14.1",
+    "zod": "^3.24.3"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
+    "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/cors": "^2.8.17",
+    "@types/express": "4.17.21",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.14.1",
+    "@types/pg": "^8.11.13",
+    "drizzle-kit": "^0.31.0",
+    "tsc-alias": "^0.0.7",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3"
+  }
+}
