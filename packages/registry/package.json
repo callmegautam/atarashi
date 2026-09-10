@@ -49,6 +49,7 @@
         "@types/semver": "^7.7.1"
     },
     "publishConfig": {
-        "access": "public"
+        "access": "public",
+        "provenance": true
     }
 }

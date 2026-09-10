@@ -1,0 +1,71 @@
+name: Release
+
+# Changesets opens a "Version Packages" PR whenever unreleased changesets land
+# on main. Merging that PR is what publishes: the same push runs this workflow
+# again, finds no changesets left, and publishes the versions the PR wrote.
+#
+# Publishing from here rather than from a laptop is what makes provenance
+# possible: npm will only attest to a build it can trace to a public workflow
+# run, which needs the `id-token: write` permission below.
+#
+# Requires one secret: NPM_TOKEN, an automation token on an account with 2FA
+# and publish rights to `atarashi` and the `@atarashi` scope.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+jobs:
+  release:
+    name: version or publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Changesets needs the history to work out what has been released.
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.11
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - run: pnpm install --frozen-lockfile
+
+      # The gates that guard a publish. Deliberately the same commands as
+      # `pnpm release:check`, minus the ones CI already ran on this commit.
+      - run: pnpm build
+      - run: pnpm test
+      - run: pnpm check:security
+      - run: pnpm validate:blueprints
+      - run: pnpm check:docs
+      - run: pnpm check:packaging
+
+      - name: version or publish
+        uses: changesets/action@v1
+        with:
+          version: pnpm run version-packages
+          publish: pnpm run release
+          commit: 'chore(release): version packages'
+          title: 'chore(release): version packages'
+          createGithubReleases: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # publishConfig.provenance is set per package; this makes the intent
+          # visible in the log and covers anything published without it.
+          NPM_CONFIG_PROVENANCE: 'true'

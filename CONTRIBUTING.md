@@ -42,8 +42,15 @@ Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`).
 Feature work goes on `feat/*` and is squash-merged. If your change affects a
 published package, run `pnpm changeset` and commit the generated file.
 
+Releases are automated: changesets on `main` open a "Version Packages" PR, and
+merging it publishes to npm with provenance. Maintainers can run every gate in
+one command first with `pnpm release:check`.
+
 ## Before you open a PR
 
 - Tests for the behaviour you changed
 - `pnpm build && pnpm typecheck && pnpm lint && pnpm test` green
-- Docs under `docs/` updated when behaviour changes
+- Docs under `docs/` updated when behaviour changes. The generated pages are
+  built from the code, so run `pnpm build:docs` rather than editing them
+- CI runs the same gates on Linux, the unit suites on macOS and Windows across
+  Node 20.11, 22 and 24, and the full e2e matrix
