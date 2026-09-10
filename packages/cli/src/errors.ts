@@ -19,7 +19,14 @@ export function reportError(printer: Printer, thrown: unknown): number {
         if (printer.options.json) {
             printer.emitJson({ ok: false, error: thrown.toJSON() });
         } else {
-            printer.error(thrown.message);
+            // The thrown message is a summary of the first error diagnostic, so
+            // printing both says the same thing twice in two different wordings.
+            // The diagnostics win: they carry the counts, the blueprint names
+            // and the suggestions. Only when none of them is an error does the
+            // summary have something to add.
+            if (!thrown.diagnostics.some((diagnostic) => diagnostic.severity === 'error')) {
+                printer.error(thrown.message);
+            }
             printDiagnostics(printer, thrown.diagnostics);
         }
         return exitCodeFor(thrown.code);

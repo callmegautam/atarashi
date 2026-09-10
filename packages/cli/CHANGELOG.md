@@ -19,6 +19,11 @@ npm:atarashi-blueprint-x` and `atarashi add npm:…` now register the package wi
 
 ### Patch Changes
 
+- Print a resolution failure once. The thrown error's message summarised the
+  first diagnostic, and both were printed, so `atarashi new --add orm/drizzle`
+  said the requirement was ambiguous twice in two different wordings. The
+  diagnostics win, since they carry the candidate list and the suggestions.
+
 - ec1979b: Close two gaps against doc 09 § T5 and § T7. Generated `.gitignore` files now
   carry `.env*` with a `!.env.example` negation, where before only `.env` and
   `.env.*.local` were ignored, leaving `.env.local` and `.env.production`

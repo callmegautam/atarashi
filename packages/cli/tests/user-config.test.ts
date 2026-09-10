@@ -29,9 +29,7 @@ describe('resolveConfigPath', () => {
         // only checks composition — the separator itself is exercised for
         // real whenever this actually runs on Windows.
         const path = resolveConfigPath({ APPDATA: 'C:\\Users\\x\\AppData\\Roaming' }, 'win32');
-        expect(path.replace(/\\/g, '/')).toBe(
-            'C:\\Users\\x\\AppData\\Roaming'.replace(/\\/g, '/') + '/atarashi/config.json'
-        );
+        expect(path.replace(/\\/g, '/')).toBe('C:/Users/x/AppData/Roaming/atarashi/config.json');
     });
 });
 
