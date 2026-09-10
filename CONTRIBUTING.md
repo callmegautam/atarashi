@@ -44,7 +44,7 @@ published package, run `pnpm changeset` and commit the generated file.
 
 Releasing is manual and maintainer-only: `pnpm release:check` runs every gate in
 one command, then `pnpm version-packages` writes the versions and changelogs and
-`pnpm release` publishes. CI never publishes.
+`pnpm release` publishes.
 
 ## Before you open a PR
 
@@ -52,5 +52,6 @@ one command, then `pnpm version-packages` writes the versions and changelogs and
 - `pnpm build && pnpm typecheck && pnpm lint && pnpm test` green
 - Docs under `docs/` updated when behaviour changes. The generated pages are
   built from the code, so run `pnpm build:docs` rather than editing them
-- CI runs the same gates on Linux, the unit suites on macOS and Windows across
-  Node 20.11, 22 and 24, and the full e2e matrix
+
+Nothing runs on GitHub. `pnpm release:check` is the whole gate, and it runs on
+your machine.
