@@ -25,10 +25,13 @@ Show
 Sleep 800ms
 
 # ── 1. Compose a project out of capabilities, not a template name ────────────
-Type "atarashi new my-api --http fastify --db postgres --orm drizzle --auth jwt --yes"
+# --no-install is on screen rather than hidden in the clean room: installing is
+# the default, it takes half a minute, and a viewer copying the line should get
+# what they watched. Generation itself is the part worth showing, and it is ~1s.
+Type "atarashi new my-api --http fastify --db postgres --orm drizzle --auth jwt --yes --no-install"
 Sleep 700ms
 Enter
-Sleep 6s
+Sleep 4s
 
 Type "cd my-api && ls"
 Sleep 400ms
@@ -46,10 +49,10 @@ Enter
 Sleep 400ms
 
 # ── 3. Add a capability to the project that already exists ───────────────────
-Type "atarashi add obs/pino --yes"
+Type "atarashi add obs/pino --yes --no-install"
 Sleep 700ms
 Enter
-Sleep 5s
+Sleep 3s
 
 Type "git diff --stat"
 Sleep 400ms

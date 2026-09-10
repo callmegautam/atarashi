@@ -21,7 +21,7 @@ cd my-api && pnpm dev
 That project installs, builds, lints, tests, boots, and answers `GET /health`
 with no edits from you. That is the bar every generated project has to clear.
 
-<!-- TODO(M7): replace with the recorded demo; see demo/README.md -->
+![Atarashi composing a project, then adding a capability to it](./demo/atarashi.gif)
 
 ## Why not templates
 

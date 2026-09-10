@@ -9,7 +9,9 @@ whenever the CLI's output changes.
 Needs [VHS](https://github.com/charmbracelet/vhs) and `ttyd`:
 
 ```bash
-brew install vhs          # or: go install github.com/charmbracelet/vhs@latest
+brew install vhs ttyd     # macOS
+sudo pacman -S vhs ttyd   # Arch
+# or: go install github.com/charmbracelet/vhs@latest
 ```
 
 VHS records whatever `atarashi` resolves to on `PATH`, so link the local build
@@ -21,7 +23,7 @@ npm link --workspace packages/cli     # or: export PATH="$PWD/node_modules/.bin:
 vhs demo/atarashi.tape
 ```
 
-Then embed it in the README, replacing the `<!-- TODO(M7) -->` line:
+It is embedded in the root README as:
 
 ```markdown
 ![Atarashi composing a project, then adding a capability to it](./demo/atarashi.gif)
@@ -40,6 +42,10 @@ Four beats, in this order, because they are the argument for the whole design:
    scattering new ones.
 4. **It refuses what cannot work.** `--add orm/drizzle` alone, and the error
    naming the three databases that would satisfy it.
+
+Both generating commands pass `--no-install` on screen rather than in the hidden
+setup block. Installing is the default and takes half a minute of spinner, and a
+viewer who copies the line should get what they watched.
 
 Beat 3 is the one that sells it. Do not cut it for length.
 
