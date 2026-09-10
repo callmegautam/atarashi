@@ -1,32 +1,63 @@
 {
-  "name": "atarashi",
-  "version": "0.6.0",
-  "description": "Accelerate your development with pre-made templates for frontend and backend projects.",
-  "main": "src/app.js",
-  "type": "module",
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/callmegautam/atarashi/blob/main/LICENSE"
+    "name": "atarashi-monorepo",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "description": "Composable project scaffolding engine — monorepo root.",
+    "license": "MIT",
+    "author": "Gautam Suthar <iamgautamsuthar@gmail.com> (https://www.github.com/callmegautam)",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/callmegautam/atarashi.git"
+    },
+    "bugs": {
+        "url": "https://github.com/callmegautam/atarashi/issues"
+    },
+    "homepage": "https://github.com/callmegautam/atarashi#readme",
+    "engines": {
+        "node": ">=20.11"
+    },
+    "packageManager": "pnpm@11.15.0",
+    "scripts": {
+        "build": "turbo run build",
+        "test": "turbo run test",
+        "test:watch": "vitest",
+        "typecheck": "turbo run typecheck",
+        "lint": "biome check .",
+        "validate:blueprints": "node scripts/validate-blueprints.mjs",
+        "check:packaging": "node scripts/check-packaging.mjs",
+        "bench": "node scripts/benchmark.mjs",
+        "e2e": "node scripts/e2e.mjs",
+        "release:check": "node scripts/release-check.mjs",
+        "lint:fix": "biome check --write .",
+        "format": "biome format --write .",
+        "clean": "turbo run clean && rm -rf node_modules/.cache .turbo",
+        "changeset": "changeset",
+        "version-packages": "changeset version",
+        "release": "turbo run build && changeset publish",
+        "prepare": "husky",
+        "build:docs": "node scripts/build-docs.mjs",
+        "check:docs": "node scripts/build-docs.mjs --check",
+        "check:security": "node scripts/check-security-tests.mjs"
+    },
+    "devDependencies": {
+        "@atarashi/testing": "workspace:*",
+        "@biomejs/biome": "^2.3.14",
+        "@changesets/cli": "^2.29.8",
+        "@commitlint/cli": "^19.8.1",
+        "@commitlint/config-conventional": "^19.8.1",
+        "@types/node": "^22.19.0",
+        "@vitest/coverage-v8": "^3.2.7",
+        "husky": "^9.1.7",
+        "lint-staged": "^16.2.7",
+        "tsup": "^8.5.0",
+        "turbo": "^2.6.4",
+        "typescript": "^5.9.3",
+        "vitest": "^3.2.4"
+    },
+    "lint-staged": {
+        "*.{ts,tsx,js,mjs,json,jsonc,md,yml,yaml}": [
+            "biome check --write --no-errors-on-unmatched"
+        ]
     }
-  ],
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "bin": {
-    "atarashi": "src/app.js"
-  },
-  "keywords": [
-    "atarashi",
-    "cli"
-  ],
-  "author": "Gautam Suthar <iamgautamsuthar@outlook.com> (https://www.github.com/callmegautam)",
-  "license": "MIT",
-  "dependencies": {
-    "inquirer": "^9.2.17"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/callmegautam/hookstack.git"
-  }
 }

@@ -1,0 +1,95 @@
+# core/node-ts
+
+# dependencies
+  dev @types/node@^22.19.0
+  dev tsx@^4.20.6
+  dev typescript@^5.9.3
+
+# files
+  .gitignore  [core/node-ts]
+  package.json  [core/node-ts, atarashi]
+  pnpm-workspace.yaml  [core/node-ts]
+  src/index.ts  [core/node-ts]
+  tsconfig.json  [core/node-ts]
+
+────────────────────────────────────────────────────────────────────────
+FILE .gitignore  (644)
+────────────────────────────────────────────────────────────────────────
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.env*
+!.env.example
+*.log
+.DS_Store
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE pnpm-workspace.yaml  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "allowBuilds": {
+    "esbuild": true
+  },
+  "onlyBuiltDependencies": [
+    "esbuild"
+  ]
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+// #region atarashi:imports
+// #endregion
+
+// #region atarashi:bootstrap
+// #endregion
+console.log('my-app is running.');
+
+────────────────────────────────────────────────────────────────────────
+FILE tsconfig.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "src",
+    "outDir": "dist",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "verbatimModuleSyntax": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

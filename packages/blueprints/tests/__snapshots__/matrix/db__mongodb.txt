@@ -1,0 +1,64 @@
+# db/mongodb
+
+# dependencies
+      mongodb@^6.20.0
+
+# files
+  .env.example  [validation/zod, db/mongodb]
+  package.json  [core/node-ts, validation/zod, db/mongodb, atarashi]
+  src/db/client.ts  [db/mongodb]
+
+────────────────────────────────────────────────────────────────────────
+FILE .env.example  (644)
+────────────────────────────────────────────────────────────────────────
+# validation/zod
+# Runtime mode: development, test or production
+NODE_ENV=development
+
+# db/mongodb
+# MongoDB connection string, including the database name
+MONGODB_URI=mongodb://localhost:27017/my_app
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "mongodb": "^6.20.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/db/client.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { MongoClient } from 'mongodb';
+
+import { env } from '../config/env.js';
+
+export const client = new MongoClient(env.MONGODB_URI);
+
+export const database = client.db();
+
+/** Fails fast at boot rather than on the first query. */
+export async function connectDatabase() {
+  await client.connect();
+  await database.command({ ping: 1 });
+}

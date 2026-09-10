@@ -1,0 +1,53 @@
+{
+    "name": "@atarashi/core",
+    "version": "1.0.0",
+    "description": "The Atarashi generation engine: resolve, render, merge, plan, write.",
+    "type": "module",
+    "license": "MIT",
+    "author": "Gautam Suthar <iamgautamsuthar@gmail.com> (https://www.github.com/callmegautam)",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/callmegautam/atarashi.git",
+        "directory": "packages/core"
+    },
+    "homepage": "https://github.com/callmegautam/atarashi/tree/main/packages/core#readme",
+    "bugs": {
+        "url": "https://github.com/callmegautam/atarashi/issues"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./package.json": "./package.json"
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "engines": {
+        "node": ">=20.11"
+    },
+    "scripts": {
+        "build": "tsup",
+        "typecheck": "tsc --noEmit -p tsconfig.json",
+        "test": "vitest run --coverage",
+        "test:coverage": "vitest run --coverage",
+        "clean": "rm -rf dist .turbo"
+    },
+    "dependencies": {
+        "@atarashi/schema": "workspace:*",
+        "handlebars": "^4.7.8",
+        "semver": "^7.7.2",
+        "yaml": "^2.8.1"
+    },
+    "devDependencies": {
+        "@types/semver": "^7.7.1"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

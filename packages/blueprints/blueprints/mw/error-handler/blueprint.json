@@ -1,0 +1,74 @@
+{
+    "manifestVersion": 1,
+    "id": "mw/error-handler",
+    "name": "Error handler",
+    "version": "1.0.0",
+    "description": "One consistent JSON error shape: an HttpError class, Zod validation mapping and no stack leaks.",
+    "category": "middleware",
+    "tags": ["errors", "middleware", "zod"],
+    "provides": ["middleware:error-handler"],
+    "requires": ["http", "validation", "config:env"],
+    "after": ["http/express", "http/fastify", "http/hono"],
+    "priority": 62,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "files": [
+        {
+            "from": "files/ts/lib/http-error.ts",
+            "to": "src/lib/http-error.ts",
+            "when": "provides('language:typescript')"
+        },
+        {
+            "from": "files/js/lib/http-error.js",
+            "to": "src/lib/http-error.js",
+            "when": "provides('language:javascript')"
+        },
+        {
+            "from": "files/ts/middlewares/error-handler.ts",
+            "to": "src/middlewares/error-handler.ts",
+            "when": "provides('language:typescript') && has('http/express')"
+        },
+        {
+            "from": "files/js/middlewares/error-handler.js",
+            "to": "src/middlewares/error-handler.js",
+            "when": "provides('language:javascript') && has('http/express')"
+        }
+    ],
+    "contributions": [
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { errorHandler } from './middlewares/error-handler.js';",
+            "when": "has('http/express')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "error-handlers",
+            "value": "app.use(errorHandler);",
+            "when": "has('http/express')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { HttpError } from './lib/http-error.js';",
+            "when": "has('http/fastify') || has('http/hono')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { ZodError } from 'zod';",
+            "when": "has('http/fastify') || has('http/hono')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "error-handlers",
+            "value": "app.setErrorHandler(async (error, _request, reply) => {\n  if (error instanceof ZodError) {\n    return reply.status(422).send({ success: false, error: 'Validation failed', details: error.issues });\n  }\n  if (error instanceof HttpError) {\n    return reply.status(error.status).send({ success: false, error: error.message });\n  }\n  app.log.error(error);\n  return reply.status(500).send({ success: false, error: 'Internal server error' });\n});",
+            "when": "has('http/fastify')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "error-handlers",
+            "value": "app.onError((error, c) => {\n  if (error instanceof ZodError) {\n    return c.json({ success: false, error: 'Validation failed', details: error.issues }, 422);\n  }\n  if (error instanceof HttpError) {\n    return c.json({ success: false, error: error.message }, error.status);\n  }\n  console.error(error);\n  return c.json({ success: false, error: 'Internal server error' }, 500);\n});",
+            "when": "has('http/hono')"
+        }
+    ]
+}

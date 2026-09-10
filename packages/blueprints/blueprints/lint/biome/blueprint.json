@@ -1,0 +1,23 @@
+{
+    "manifestVersion": 1,
+    "id": "lint/biome",
+    "name": "Biome",
+    "version": "1.0.0",
+    "description": "Biome as the single linter and formatter: one binary, one config, no plugin matrix.",
+    "category": "lint",
+    "tags": ["biome", "lint", "format"],
+    "provides": ["lint", "lint:biome", "format"],
+    "conflicts": ["lint", "format"],
+    "requires": ["runtime:node"],
+    "priority": 90,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "files": [{ "from": "files/biome.json.hbs", "to": "biome.json", "merge": "json-deep" }],
+    "devDependencies": { "@biomejs/biome": "^2.3.14" },
+    "scripts": {
+        "lint": "biome check .",
+        "lint:fix": "biome check --write .",
+        "format": "biome format --write .",
+        "format:check": "biome format ."
+    },
+    "nextSteps": ["Lint the project:  {{ pm.run }} lint"]
+}

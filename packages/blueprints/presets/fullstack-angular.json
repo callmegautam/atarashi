@@ -1,0 +1,30 @@
+{
+    "manifestVersion": 1,
+    "kind": "preset",
+    "id": "preset/fullstack-angular",
+    "name": "Angular frontend + TypeScript API",
+    "version": "1.0.0",
+    "description": "The backend-ts API at the root with an Angular and Tailwind app under web/.",
+    "tags": ["fullstack", "angular", "express", "postgres"],
+    "blueprints": [
+        "core/node-ts",
+        "validation/zod",
+        "db/postgres",
+        "orm/drizzle",
+        "http/express",
+        "mw/cors",
+        "mw/helmet",
+        "mw/error-handler",
+        "obs/pino",
+        "auth/jwt",
+        "web/angular-tailwind",
+        "infra/docker",
+        "lint/eslint-prettier",
+        "test/vitest",
+        "ci/github",
+        "meta/readme",
+        "meta/license",
+        "meta/editorconfig"
+    ],
+    "answers": { "db.pool": true, "auth.expiry": "7d" }
+}

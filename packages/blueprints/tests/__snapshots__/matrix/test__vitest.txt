@@ -1,0 +1,106 @@
+# test/vitest
+
+# dependencies
+  dev @types/supertest@^6.0.3
+  dev @vitest/coverage-v8@^3.2.4
+  dev supertest@^7.1.4
+  dev vitest@^3.2.4
+
+# files
+  .gitignore  [core/node-ts, test/vitest]
+  package.json  [core/node-ts, validation/zod, http/express, test/vitest, atarashi]
+  pnpm-workspace.yaml  [core/node-ts, test/vitest]
+  tests/health.test.ts  [test/vitest]
+  vitest.config.ts  [test/vitest]
+
+────────────────────────────────────────────────────────────────────────
+FILE .gitignore  (644)
+────────────────────────────────────────────────────────────────────────
+# core/node-ts
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.env*
+!.env.example
+*.log
+.DS_Store
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.23",
+    "@types/node": "^22.19.0",
+    "@types/supertest": "^6.0.3",
+    "@vitest/coverage-v8": "^3.2.4",
+    "supertest": "^7.1.4",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE pnpm-workspace.yaml  (644)
+────────────────────────────────────────────────────────────────────────
+allowBuilds:
+  esbuild: true
+onlyBuiltDependencies:
+  - esbuild
+
+────────────────────────────────────────────────────────────────────────
+FILE tests/health.test.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import request from 'supertest';
+import { describe, expect, it } from 'vitest';
+
+import { app } from '../src/app.js';
+
+describe('GET /health', () => {
+  it('reports the service as healthy', async () => {
+    const response = await request(app).get('/health');
+
+    expect(response.status).toBe(200);
+    expect(response.body.status).toBe('ok');
+  });
+});
+
+────────────────────────────────────────────────────────────────────────
+FILE vitest.config.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    environment: 'node',
+    // A new project has no tests yet; that is not a failure.
+    passWithNoTests: true,
+    include: ['tests/**/*.test.ts'],
+    coverage: {
+      provider: 'v8',
+      include: ['src/**'],
+      reporter: ['text', 'lcov'],
+    },
+  },
+});

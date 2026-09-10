@@ -1,0 +1,55 @@
+{
+    "name": "@atarashi/blueprints",
+    "version": "1.0.0",
+    "description": "The first-party Atarashi blueprint collection.",
+    "type": "module",
+    "license": "MIT",
+    "author": "Gautam Suthar <iamgautamsuthar@gmail.com> (https://www.github.com/callmegautam)",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/callmegautam/atarashi.git",
+        "directory": "packages/blueprints"
+    },
+    "homepage": "https://github.com/callmegautam/atarashi/tree/main/packages/blueprints#readme",
+    "bugs": {
+        "url": "https://github.com/callmegautam/atarashi/issues"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./blueprints/*": "./blueprints/*",
+        "./package.json": "./package.json"
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist",
+        "blueprints",
+        "presets",
+        "version-manifest.json",
+        "README.md",
+        "LICENSE"
+    ],
+    "engines": {
+        "node": ">=20.11"
+    },
+    "scripts": {
+        "build": "tsup",
+        "typecheck": "tsc --noEmit -p tsconfig.json",
+        "test": "vitest run --passWithNoTests",
+        "clean": "rm -rf dist .turbo"
+    },
+    "dependencies": {
+        "@atarashi/schema": "workspace:*"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "devDependencies": {
+        "@atarashi/core": "workspace:*",
+        "@atarashi/registry": "workspace:*",
+        "@atarashi/testing": "workspace:*"
+    }
+}

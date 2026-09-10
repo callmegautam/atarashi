@@ -1,0 +1,23 @@
+{
+    "manifestVersion": 1,
+    "id": "ci/github",
+    "name": "GitHub Actions",
+    "version": "1.0.0",
+    "description": "A CI workflow that installs, lints, typechecks, builds and tests on every push and pull request.",
+    "category": "ci",
+    "tags": ["ci", "github-actions", "automation"],
+    "provides": ["ci", "ci:github"],
+    "conflicts": ["ci"],
+    "requires": ["runtime:node"],
+    "after": ["lint/eslint-prettier", "lint/biome", "test/vitest", "test/jest"],
+    "priority": 85,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "files": [
+        {
+            "from": "files/_github/workflows/ci.yml.hbs",
+            "to": ".github/workflows/ci.yml",
+            "merge": "yaml-deep"
+        }
+    ],
+    "nextSteps": ["Push a branch and open a pull request to see CI run"]
+}

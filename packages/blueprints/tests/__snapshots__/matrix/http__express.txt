@@ -1,0 +1,159 @@
+# http/express
+
+# dependencies
+  dev @types/express@^4.17.23
+      express@^4.21.2
+
+# files
+  .env.example  [validation/zod, http/express]
+  package.json  [core/node-ts, validation/zod, http/express, atarashi]
+  src/app.ts  [http/express]
+  src/lib/async-handler.ts  [http/express]
+  src/lib/http.ts  [http/express]
+  src/routes/index.ts  [http/express]
+
+────────────────────────────────────────────────────────────────────────
+FILE .env.example  (644)
+────────────────────────────────────────────────────────────────────────
+# validation/zod
+# Runtime mode: development, test or production
+NODE_ENV=development
+
+# http/express
+# Port the HTTP server listens on
+PORT=3000
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.23",
+    "@types/node": "^22.19.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/app.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import express from 'express';
+
+import { router } from './routes/index.js';
+// #region atarashi:imports
+// #endregion
+
+const app = express();
+
+app.disable('x-powered-by');
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true }));
+// #region atarashi:middleware
+// #endregion
+
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime() });
+});
+
+app.use('/api/v1', router);
+// #region atarashi:routes
+// #endregion
+
+app.use((_req, res) => {
+  res.status(404).json({ success: false, error: 'Not found' });
+});
+// #region atarashi:error-handlers
+// #endregion
+
+export { app };
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/async-handler.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
+
+/**
+ * Wraps an async route handler so a rejected promise reaches the error
+ * middleware instead of becoming an unhandled rejection.
+ */
+export const asyncHandler =
+  (handler: RequestHandler): RequestHandler =>
+  (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(handler(req, res, next)).catch(next);
+  };
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/http.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import type { Response } from 'express';
+
+export const HttpStatus = Object.freeze({
+  OK: 200,
+  CREATED: 201,
+  NO_CONTENT: 204,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  CONFLICT: 409,
+  UNPROCESSABLE_ENTITY: 422,
+  TOO_MANY_REQUESTS: 429,
+  INTERNAL_SERVER_ERROR: 500,
+});
+
+export type HttpStatusCode = (typeof HttpStatus)[keyof typeof HttpStatus];
+
+export interface ApiSuccess<T> {
+  success: true;
+  data: T;
+}
+
+export interface ApiFailure {
+  success: false;
+  error: string;
+  details?: unknown;
+}
+
+export function sendSuccess<T>(res: Response, data: T, status: number = HttpStatus.OK) {
+  const body: ApiSuccess<T> = { success: true, data };
+  return res.status(status).json(body);
+}
+
+export function sendError(
+  res: Response,
+  error: string,
+  status: number = HttpStatus.INTERNAL_SERVER_ERROR,
+  details?: unknown,
+) {
+  const body: ApiFailure = { success: false, error, ...(details === undefined ? {} : { details }) };
+  return res.status(status).json(body);
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/routes/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { Router } from 'express';
+
+/** Mounted at `/api/v1`. Add your feature routers here. */
+export const router = Router();
+
+router.get('/', (_req, res) => {
+  res.json({ success: true, data: { name: 'my-app', version: 1 } });
+});

@@ -1,0 +1,44 @@
+{
+    "manifestVersion": 1,
+    "id": "core/node-js",
+    "name": "Node.js (JavaScript)",
+    "version": "1.0.0",
+    "description": "Node 20 ESM project in plain JavaScript, with jsconfig for editor navigation.",
+    "category": "core",
+    "tags": ["javascript", "node", "core"],
+    "provides": ["runtime:node", "language", "language:javascript"],
+    "conflicts": ["language"],
+    "priority": 10,
+    "engines": {
+        "atarashi": ">=1.0.0-0 <2.0.0",
+        "node": ">=20.11"
+    },
+    "files": [
+        {
+            "from": "files/jsconfig.json.hbs",
+            "to": "jsconfig.json",
+            "when": "!provides('ui') || provides('http')",
+            "merge": "json-deep"
+        },
+        {
+            "from": "files/src/index.js.hbs",
+            "to": "src/index.js",
+            "when": "!provides('ui') || provides('http')"
+        }
+    ],
+    "devDependencies": {
+        "@types/node": "^22.19.0"
+    },
+    "scripts": {
+        "dev": {
+            "value": "node --watch src/index.js",
+            "when": "!provides('ui') || provides('http')"
+        },
+        "start": {
+            "value": "node src/index.js",
+            "when": "!provides('ui') || provides('http')"
+        }
+    },
+    "gitignore": ["node_modules/", "coverage/", ".env*", "!.env.example", "*.log", ".DS_Store"],
+    "nextSteps": ["Start the dev server:  {{ pm.run }} dev"]
+}

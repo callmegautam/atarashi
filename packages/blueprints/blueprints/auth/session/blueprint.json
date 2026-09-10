@@ -1,0 +1,96 @@
+{
+    "manifestVersion": 1,
+    "id": "auth/session",
+    "name": "Session authentication",
+    "version": "1.0.0",
+    "description": "Cookie-session auth for Express: signed session middleware, bcrypt hashing and a guard.",
+    "category": "auth",
+    "tags": ["auth", "session", "cookie", "security"],
+    "provides": ["auth", "auth:session"],
+    "conflicts": ["auth"],
+    "requires": ["http:express", "config:env"],
+    "after": ["http/express"],
+    "priority": 70,
+    "engines": {
+        "atarashi": ">=1.0.0-0 <2.0.0",
+        "node": ">=20.11"
+    },
+    "files": [
+        {
+            "from": "files/ts/lib/password.ts",
+            "to": "src/lib/password.ts",
+            "when": "provides('language:typescript')"
+        },
+        {
+            "from": "files/js/lib/password.js",
+            "to": "src/lib/password.js",
+            "when": "provides('language:javascript')"
+        },
+        {
+            "from": "files/ts/middlewares/auth.ts",
+            "to": "src/middlewares/auth.ts",
+            "when": "provides('language:typescript')"
+        },
+        {
+            "from": "files/js/middlewares/auth.js",
+            "to": "src/middlewares/auth.js",
+            "when": "provides('language:javascript')"
+        },
+        {
+            "from": "files/ts/types/session.d.ts",
+            "to": "src/types/session.d.ts",
+            "when": "provides('language:typescript')"
+        }
+    ],
+    "dependencies": {
+        "express-session": "^1.18.2",
+        "bcryptjs": "^3.0.2"
+    },
+    "devDependencies": {
+        "@types/express-session": {
+            "version": "^1.18.2",
+            "when": "provides('language:typescript')"
+        },
+        "@types/bcryptjs": {
+            "version": "^3.0.0",
+            "when": "provides('language:typescript')"
+        }
+    },
+    "env": [
+        {
+            "key": "SESSION_SECRET",
+            "sample": "generate with: openssl rand -hex 32",
+            "description": "Key used to sign the session cookie; at least 32 characters",
+            "required": true,
+            "secret": true,
+            "generate": "hex-32"
+        }
+    ],
+    "contributions": [
+        {
+            "target": "src/config/env.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "env-schema",
+            "value": "SESSION_SECRET: z.string().min(32, 'SESSION_SECRET must be at least 32 characters'),"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import session from 'express-session';"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { env } from './config/env.js';"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "middleware",
+            "value": "app.use(\n  session({\n    name: '{{ project.slug }}.sid',\n    secret: env.SESSION_SECRET,\n    resave: false,\n    saveUninitialized: false,\n    cookie: {\n      httpOnly: true,\n      sameSite: 'lax',\n      secure: env.NODE_ENV === 'production',\n      maxAge: 1000 * 60 * 60 * 24 * 7,\n    },\n  }),\n);"
+        }
+    ],
+    "nextSteps": [
+        "Generate a session key:  openssl rand -hex 32",
+        "Put it in .env as SESSION_SECRET",
+        "The default store is in-memory; swap it for Redis before production"
+    ]
+}

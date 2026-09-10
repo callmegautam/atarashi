@@ -1,0 +1,86 @@
+# mw/error-handler
+
+# dependencies
+
+# files
+  src/lib/http-error.ts  [mw/error-handler]
+  src/middlewares/error-handler.ts  [mw/error-handler]
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/http-error.ts  (644)
+────────────────────────────────────────────────────────────────────────
+/**
+ * The one error type route handlers should throw. Anything else reaching the
+ * handler is treated as a bug and reported as a 500 without leaking details.
+ */
+export class HttpError extends Error {
+  readonly status: number;
+  readonly details: unknown;
+
+  constructor(status: number, message: string, details?: unknown) {
+    super(message);
+    this.name = 'HttpError';
+    this.status = status;
+    this.details = details;
+  }
+
+  static badRequest(message = 'Bad request', details?: unknown) {
+    return new HttpError(400, message, details);
+  }
+
+  static unauthorized(message = 'Authentication required') {
+    return new HttpError(401, message);
+  }
+
+  static forbidden(message = 'Forbidden') {
+    return new HttpError(403, message);
+  }
+
+  static notFound(message = 'Not found') {
+    return new HttpError(404, message);
+  }
+
+  static conflict(message = 'Conflict') {
+    return new HttpError(409, message);
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/middlewares/error-handler.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import type { NextFunction, Request, Response } from 'express';
+import { ZodError } from 'zod';
+
+import { env } from '../config/env.js';
+import { HttpError } from '../lib/http-error.js';
+
+/**
+ * Express identifies an error handler by its four parameters, so `next` stays
+ * in the signature even though it is unused on the happy path.
+ */
+export function errorHandler(error: unknown, _req: Request, res: Response, next: NextFunction) {
+  if (res.headersSent) {
+    next(error);
+    return;
+  }
+
+  if (error instanceof ZodError) {
+    res.status(422).json({ success: false, error: 'Validation failed', details: error.issues });
+    return;
+  }
+
+  if (error instanceof HttpError) {
+    res.status(error.status).json({
+      success: false,
+      error: error.message,
+      ...(error.details === undefined ? {} : { details: error.details }),
+    });
+    return;
+  }
+
+  if (env.NODE_ENV !== 'production') {
+    console.error(error);
+  }
+
+  res.status(500).json({ success: false, error: 'Internal server error' });
+}

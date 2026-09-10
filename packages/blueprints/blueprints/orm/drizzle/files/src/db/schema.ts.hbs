@@ -1,0 +1,38 @@
+{{#when "has('db/postgres')"}}
+import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+
+/** A starter table. Delete it once you have a real one. */
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  email: text('email').notNull().unique(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }),
+});
+{{/when}}
+{{#when "has('db/mysql')"}}
+import { int, mysqlTable, timestamp, varchar } from 'drizzle-orm/mysql-core';
+
+/** A starter table. Delete it once you have a real one. */
+export const users = mysqlTable('users', {
+  id: int('id').primaryKey().autoincrement(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at'),
+});
+{{/when}}
+{{#when "has('db/sqlite')"}}
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+
+/** A starter table. Delete it once you have a real one. */
+export const users = sqliteTable('users', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  email: text('email').notNull().unique(),
+  createdAt: integer('created_at', { mode: 'timestamp' })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }),
+});
+{{/when}}
+
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;

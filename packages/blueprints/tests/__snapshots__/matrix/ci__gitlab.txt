@@ -1,0 +1,41 @@
+# ci/gitlab
+
+# dependencies
+
+# files
+  .gitlab-ci.yml  [ci/gitlab]
+
+────────────────────────────────────────────────────────────────────────
+FILE .gitlab-ci.yml  (644)
+────────────────────────────────────────────────────────────────────────
+image: node:22
+
+stages:
+  - scan
+  - verify
+
+cache:
+  key:
+    files:
+      - pnpm-lock.yaml
+  paths:
+    - node_modules/
+
+# Doc 09 § T5: a committed `.env` is the leak this catches.
+secrets:
+  stage: scan
+  image:
+    name: zricethezav/gitleaks:latest
+    entrypoint: ['']
+  script:
+    - gitleaks detect --source . --redact --verbose
+
+verify:
+  stage: verify
+  before_script:
+    - corepack enable
+    - pnpm install
+  script:
+    - pnpm run typecheck
+    - pnpm run build
+    - echo "verified"

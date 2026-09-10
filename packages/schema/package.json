@@ -1,0 +1,51 @@
+{
+    "name": "@atarashi/schema",
+    "version": "1.0.0",
+    "description": "Zod schemas and types for the Atarashi project spec, blueprint manifests and registry index.",
+    "type": "module",
+    "license": "MIT",
+    "author": "Gautam Suthar <iamgautamsuthar@gmail.com> (https://www.github.com/callmegautam)",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/callmegautam/atarashi.git",
+        "directory": "packages/schema"
+    },
+    "homepage": "https://github.com/callmegautam/atarashi/tree/main/packages/schema#readme",
+    "bugs": {
+        "url": "https://github.com/callmegautam/atarashi/issues"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./package.json": "./package.json",
+        "./schemas/*": "./schemas/*"
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist",
+        "schemas",
+        "README.md",
+        "LICENSE"
+    ],
+    "engines": {
+        "node": ">=20.11"
+    },
+    "scripts": {
+        "build": "tsup && node --experimental-strip-types scripts/emit-json-schema.mts",
+        "typecheck": "tsc --noEmit -p tsconfig.json",
+        "test": "vitest run --coverage",
+        "clean": "rm -rf dist .turbo"
+    },
+    "dependencies": {
+        "zod": "^3.25.76"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "devDependencies": {
+        "zod-to-json-schema": "^3.24.6"
+    }
+}

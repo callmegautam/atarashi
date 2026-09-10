@@ -1,0 +1,55 @@
+{
+    "manifestVersion": 1,
+    "id": "meta/husky",
+    "name": "Husky + lint-staged",
+    "version": "1.0.0",
+    "description": "A pre-commit hook that lints and formats only the files being committed.",
+    "category": "meta",
+    "tags": ["husky", "lint-staged", "git", "hooks"],
+    "provides": ["meta:git-hooks"],
+    "requires": ["runtime:node", "lint"],
+    "after": ["lint/eslint-prettier", "lint/biome"],
+    "priority": 97,
+    "engines": {
+        "atarashi": ">=1.0.0-0 <2.0.0",
+        "node": ">=20.11"
+    },
+    "files": [
+        {
+            "from": "files/_husky/pre-commit",
+            "to": ".husky/pre-commit",
+            "mode": "755"
+        }
+    ],
+    "devDependencies": {
+        "husky": "^9.1.7",
+        "lint-staged": "^16.2.7"
+    },
+    "scripts": {
+        "prepare": "husky"
+    },
+    "contributions": [
+        {
+            "target": "package.json",
+            "merge": "json-deep",
+            "when": "has('lint/eslint-prettier')",
+            "value": {
+                "lint-staged": {
+                    "*.{ts,js,mjs,cjs}": ["eslint --fix", "prettier --write"],
+                    "*.{json,md,yml,yaml}": ["prettier --write"]
+                }
+            }
+        },
+        {
+            "target": "package.json",
+            "merge": "json-deep",
+            "when": "has('lint/biome')",
+            "value": {
+                "lint-staged": {
+                    "*.{ts,js,mjs,cjs,json,jsonc}": ["biome check --write --no-errors-on-unmatched"]
+                }
+            }
+        }
+    ],
+    "nextSteps": ["Hooks install on the next `{{ pm.install }}`"]
+}

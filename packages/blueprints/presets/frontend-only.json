@@ -1,0 +1,18 @@
+{
+    "manifestVersion": 1,
+    "kind": "preset",
+    "id": "preset/frontend-only",
+    "name": "React single-page app",
+    "version": "1.0.0",
+    "description": "React, Vite and Tailwind on their own, with Biome for linting and formatting.",
+    "tags": ["frontend", "react", "vite", "spa"],
+    "blueprints": [
+        "core/node-ts",
+        "web/react-vite-tailwind",
+        "lint/biome",
+        "meta/readme",
+        "meta/license",
+        "meta/editorconfig"
+    ],
+    "answers": {}
+}

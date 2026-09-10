@@ -1,0 +1,379 @@
+# blueprints
+  core/node-js@1.0.0
+  validation/zod@1.0.0
+  http/express@1.0.0
+  mw/cors@1.0.0
+  mw/error-handler@1.0.0
+
+# dependencies
+  cors@^2.8.5  (mw/cors)
+  dotenv@^17.4.2  (validation/zod)
+  express@^4.21.2  (http/express)
+  zod@^3.25.76  (validation/zod)
+
+# devDependencies
+  @types/node@^22.19.0  (core/node-js)
+
+# warnings
+
+# next steps
+  Start the dev server:  pnpm run dev
+  Copy `.env.example` to `.env` and fill in the blanks
+  Check the API:  curl http://localhost:3000/health
+
+# files
+  .env.example
+  .gitignore
+  atarashi.json
+  jsconfig.json
+  package.json
+  src/app.js
+  src/config/env.js
+  src/index.js
+  src/lib/async-handler.js
+  src/lib/http-error.js
+  src/lib/http.js
+  src/middlewares/error-handler.js
+  src/routes/index.js
+
+────────────────────────────────────────────────────────────────────────
+FILE .env.example  (644)
+────────────────────────────────────────────────────────────────────────
+# validation/zod
+# Runtime mode: development, test or production
+NODE_ENV=development
+
+# http/express
+# Port the HTTP server listens on
+PORT=3000
+
+# mw/cors
+# Comma-separated list of allowed origins, or * for any
+CORS_ORIGIN=*
+
+────────────────────────────────────────────────────────────────────────
+FILE .gitignore  (644)
+────────────────────────────────────────────────────────────────────────
+node_modules/
+coverage/
+.env*
+!.env.example
+*.log
+.DS_Store
+
+────────────────────────────────────────────────────────────────────────
+FILE atarashi.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "$schema": "https://unpkg.com/@atarashi/schema/schemas/atarashi.schema.json",
+  "specVersion": 1,
+  "atarashiVersion": "1.0.0",
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "name": "my-app",
+  "blueprints": [
+    {
+      "id": "core/node-js",
+      "version": "1.0.0"
+    },
+    {
+      "id": "validation/zod",
+      "version": "1.0.0"
+    },
+    {
+      "id": "http/express",
+      "version": "1.0.0"
+    },
+    {
+      "id": "mw/cors",
+      "version": "1.0.0"
+    },
+    {
+      "id": "mw/error-handler",
+      "version": "1.0.0"
+    }
+  ],
+  "answers": {
+    "auth.expiry": "7d",
+    "db.name": "my_app",
+    "db.pool": true
+  },
+  "options": {
+    "packageManager": "pnpm",
+    "git": true,
+    "install": true,
+    "format": true,
+    "initialCommit": true,
+    "license": "MIT",
+    "author": {
+      "name": "Ada Lovelace",
+      "email": "ada@example.com"
+    },
+    "writeEnv": false,
+    "force": false
+  },
+  "description": "A generated project"
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE jsconfig.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "checkJs": true,
+    "strict": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*.js"],
+  "exclude": ["node_modules"]
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A generated project",
+  "license": "MIT",
+  "author": "Ada Lovelace <ada@example.com>",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/app.js  (644)
+────────────────────────────────────────────────────────────────────────
+import express from 'express';
+
+import { router } from './routes/index.js';
+// #region atarashi:imports
+import { env } from './config/env.js';
+import cors from 'cors';
+import { errorHandler } from './middlewares/error-handler.js';
+
+// #endregion
+
+const app = express();
+
+app.disable('x-powered-by');
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true }));
+// #region atarashi:middleware
+app.use(
+  cors({
+    origin: env.CORS_ORIGIN === '*' ? true : env.CORS_ORIGIN.split(','),
+    credentials: true,
+  }),
+);
+// #endregion
+
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime() });
+});
+
+app.use('/api/v1', router);
+// #region atarashi:routes
+// #endregion
+
+app.use((_req, res) => {
+  res.status(404).json({ success: false, error: 'Not found' });
+});
+// #region atarashi:error-handlers
+app.use(errorHandler);
+// #endregion
+
+export { app };
+
+────────────────────────────────────────────────────────────────────────
+FILE src/config/env.js  (644)
+────────────────────────────────────────────────────────────────────────
+import { config } from 'dotenv';
+import { z } from 'zod';
+
+// Loads `.env` when one is present, before anything reads `process.env`. A
+// missing file is not an error: in production the platform supplies the
+// environment, and `dotenv` leaves whatever is already set untouched.
+config({ quiet: true });
+
+/**
+ * The single source of truth for configuration. Every blueprint that needs an
+ * environment variable contributes its line to the region below, so the shape
+ * of `env` always matches `.env.example`.
+ */
+const schema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  // #region atarashi:env-schema
+  PORT: z.coerce.number().int().positive().default(3000),
+  CORS_ORIGIN: z.string().default('*'),
+  // #endregion
+});
+
+const parsed = schema.safeParse(process.env);
+
+if (!parsed.success) {
+  console.error('Invalid environment variables:');
+  for (const issue of parsed.error.issues) {
+    console.error(`  - ${issue.path.join('.') || '(root)'}: ${issue.message}`);
+  }
+  process.exit(1);
+}
+
+export const env = parsed.data;
+
+────────────────────────────────────────────────────────────────────────
+FILE src/index.js  (644)
+────────────────────────────────────────────────────────────────────────
+// #region atarashi:imports
+import { app } from './app.js';
+import { env } from './config/env.js';
+
+// #endregion
+
+// #region atarashi:bootstrap
+app.listen(env.PORT, () => {
+  console.log(`my-app listening on http://localhost:${env.PORT}`);
+});
+// #endregion
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/async-handler.js  (644)
+────────────────────────────────────────────────────────────────────────
+/**
+ * Wraps an async route handler so a rejected promise reaches the error
+ * middleware instead of becoming an unhandled rejection.
+ */
+export const asyncHandler = (handler) => (req, res, next) => {
+  Promise.resolve(handler(req, res, next)).catch(next);
+};
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/http-error.js  (644)
+────────────────────────────────────────────────────────────────────────
+/**
+ * The one error type route handlers should throw. Anything else reaching the
+ * handler is treated as a bug and reported as a 500 without leaking details.
+ */
+export class HttpError extends Error {
+  constructor(status, message, details) {
+    super(message);
+    this.name = 'HttpError';
+    this.status = status;
+    this.details = details;
+  }
+
+  static badRequest(message = 'Bad request', details) {
+    return new HttpError(400, message, details);
+  }
+
+  static unauthorized(message = 'Authentication required') {
+    return new HttpError(401, message);
+  }
+
+  static forbidden(message = 'Forbidden') {
+    return new HttpError(403, message);
+  }
+
+  static notFound(message = 'Not found') {
+    return new HttpError(404, message);
+  }
+
+  static conflict(message = 'Conflict') {
+    return new HttpError(409, message);
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/http.js  (644)
+────────────────────────────────────────────────────────────────────────
+export const HttpStatus = Object.freeze({
+  OK: 200,
+  CREATED: 201,
+  NO_CONTENT: 204,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  CONFLICT: 409,
+  UNPROCESSABLE_ENTITY: 422,
+  TOO_MANY_REQUESTS: 429,
+  INTERNAL_SERVER_ERROR: 500,
+});
+
+export function sendSuccess(res, data, status = HttpStatus.OK) {
+  return res.status(status).json({ success: true, data });
+}
+
+export function sendError(res, error, status = HttpStatus.INTERNAL_SERVER_ERROR, details) {
+  return res.status(status).json({
+    success: false,
+    error,
+    ...(details === undefined ? {} : { details }),
+  });
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/middlewares/error-handler.js  (644)
+────────────────────────────────────────────────────────────────────────
+import { ZodError } from 'zod';
+
+import { env } from '../config/env.js';
+import { HttpError } from '../lib/http-error.js';
+
+/**
+ * Express identifies an error handler by its four parameters, so `next` stays
+ * in the signature even though it is unused on the happy path.
+ */
+export function errorHandler(error, _req, res, next) {
+  if (res.headersSent) {
+    next(error);
+    return;
+  }
+
+  if (error instanceof ZodError) {
+    res.status(422).json({ success: false, error: 'Validation failed', details: error.issues });
+    return;
+  }
+
+  if (error instanceof HttpError) {
+    res.status(error.status).json({
+      success: false,
+      error: error.message,
+      ...(error.details === undefined ? {} : { details: error.details }),
+    });
+    return;
+  }
+
+  if (env.NODE_ENV !== 'production') {
+    console.error(error);
+  }
+
+  res.status(500).json({ success: false, error: 'Internal server error' });
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/routes/index.js  (644)
+────────────────────────────────────────────────────────────────────────
+import { Router } from 'express';
+
+/** Mounted at `/api/v1`. Add your feature routers here. */
+export const router = Router();
+
+router.get('/', (_req, res) => {
+  res.json({ success: true, data: { name: 'my-app', version: 1 } });
+});

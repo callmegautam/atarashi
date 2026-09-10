@@ -1,0 +1,16 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "{{#when "has('db/postgres')"}}postgresql{{/when}}{{#when "has('db/mysql')"}}mysql{{/when}}{{#when "has('db/sqlite')"}}sqlite{{/when}}"
+  url      = env("DATABASE_URL")
+}
+
+/// A starter model. Delete it once you have a real one.
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

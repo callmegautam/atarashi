@@ -1,0 +1,19 @@
+{
+    "manifestVersion": 1,
+    "id": "infra/docker",
+    "name": "Dockerfile",
+    "version": "1.0.0",
+    "description": "Multi-stage Dockerfile that builds with the project's package manager and runs as a non-root user.",
+    "category": "infra",
+    "tags": ["docker", "container", "infra"],
+    "provides": ["infra:docker"],
+    "requires": ["runtime:node"],
+    "after": ["core/node-ts", "core/node-js"],
+    "priority": 80,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "files": [
+        { "from": "files/Dockerfile.hbs", "to": "Dockerfile" },
+        { "from": "files/_dockerignore", "to": ".dockerignore", "merge": "lines-unique" }
+    ],
+    "nextSteps": ["Build the image:  docker build -t {{ project.slug }} ."]
+}

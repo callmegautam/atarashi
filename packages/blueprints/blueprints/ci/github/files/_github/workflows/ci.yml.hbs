@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # gitleaks scans history, not just the tip.
+          fetch-depth: 0
+      # Doc 09 § T5: a committed `.env` is the leak this catches. The CLI in a
+      # container rather than the action, so it needs no token and no licence.
+      - name: Scan for committed secrets
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest detect --source /repo --redact --verbose
+{{#when "pm.name === 'pnpm'"}}
+      - uses: pnpm/action-setup@v4
+{{/when}}
+{{#when "pm.name === 'bun'"}}
+      - uses: oven-sh/setup-bun@v2
+{{/when}}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+{{#when "pm.name !== 'bun'"}}
+          cache: '{{ pm.name }}'
+{{/when}}
+      - run: {{ pm.install }}
+{{#when "provides('lint')"}}
+      - run: {{ pm.run }} lint
+{{/when}}
+{{#when "provides('language:typescript')"}}
+      - run: {{ pm.run }} typecheck
+      - run: {{ pm.run }} build
+{{/when}}
+{{#when "provides('test')"}}
+      - run: {{ pm.run }} test
+{{/when}}

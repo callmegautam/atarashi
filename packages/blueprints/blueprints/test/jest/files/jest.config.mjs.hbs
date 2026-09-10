@@ -1,0 +1,14 @@
+/** @type {import('jest').Config} */
+export default {
+  testEnvironment: 'node',
+{{#when "provides('language:typescript')"}}
+  preset: 'ts-jest/presets/default-esm',
+  extensionsToTreatAsEsm: ['.ts'],
+  moduleNameMapper: { '^(\\.{1,2}/.*)\\.js$': '$1' },
+  testMatch: ['<rootDir>/tests/**/*.test.ts'],
+{{/when}}
+{{#when "provides('language:javascript')"}}
+  testMatch: ['<rootDir>/tests/**/*.test.js'],
+{{/when}}
+  collectCoverageFrom: ['src/**/*.{ts,js}'],
+};

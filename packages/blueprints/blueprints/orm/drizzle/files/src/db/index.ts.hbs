@@ -1,0 +1,26 @@
+{{#when "has('db/postgres')"}}
+import { drizzle } from 'drizzle-orm/node-postgres';
+
+import { pool } from './client.js';
+import * as schema from './schema.js';
+
+export const db = drizzle(pool, { schema });
+{{/when}}
+{{#when "has('db/mysql')"}}
+import { drizzle } from 'drizzle-orm/mysql2';
+
+import { pool } from './client.js';
+import * as schema from './schema.js';
+
+export const db = drizzle(pool, { schema, mode: 'default' });
+{{/when}}
+{{#when "has('db/sqlite')"}}
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+
+import { database } from './client.js';
+import * as schema from './schema.js';
+
+export const db = drizzle(database, { schema });
+{{/when}}
+
+export type Database = typeof db;

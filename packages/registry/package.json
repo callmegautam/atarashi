@@ -1,0 +1,54 @@
+{
+    "name": "@atarashi/registry",
+    "version": "1.0.0",
+    "description": "Blueprint registry: fetch, verify, cache, pin and load blueprints.",
+    "type": "module",
+    "license": "MIT",
+    "author": "Gautam Suthar <iamgautamsuthar@gmail.com> (https://www.github.com/callmegautam)",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/callmegautam/atarashi.git",
+        "directory": "packages/registry"
+    },
+    "homepage": "https://github.com/callmegautam/atarashi/tree/main/packages/registry#readme",
+    "bugs": {
+        "url": "https://github.com/callmegautam/atarashi/issues"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./package.json": "./package.json"
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "engines": {
+        "node": ">=20.11"
+    },
+    "scripts": {
+        "build": "tsup",
+        "typecheck": "tsc --noEmit -p tsconfig.json",
+        "build:index": "node --experimental-strip-types scripts/build-index.mts",
+        "bump:versions": "node --experimental-strip-types scripts/bump-version-manifest.mts",
+        "test": "vitest run --coverage",
+        "clean": "rm -rf dist .turbo"
+    },
+    "dependencies": {
+        "@atarashi/core": "workspace:*",
+        "@atarashi/schema": "workspace:*",
+        "semver": "^7.7.2",
+        "tar": "^7.5.2"
+    },
+    "devDependencies": {
+        "@types/semver": "^7.7.1"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

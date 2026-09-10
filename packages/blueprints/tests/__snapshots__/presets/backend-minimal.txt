@@ -1,0 +1,543 @@
+# blueprints
+  core/node-ts@1.0.0
+  validation/zod@1.0.0
+  http/express@1.0.0
+  mw/error-handler@1.0.0
+  lint/biome@1.0.0
+  meta/editorconfig@1.0.0
+  meta/readme@1.0.0
+
+# dependencies
+  dotenv@^17.4.2  (validation/zod)
+  express@^4.21.2  (http/express)
+  zod@^3.25.76  (validation/zod)
+
+# devDependencies
+  @biomejs/biome@^2.3.14  (lint/biome)
+  @types/express@^4.17.23  (http/express)
+  @types/node@^22.19.0  (core/node-ts)
+  tsx@^4.20.6  (core/node-ts)
+  typescript@^5.9.3  (core/node-ts)
+
+# next steps
+  Start the dev server:  pnpm run dev
+  Copy `.env.example` to `.env` and fill in the blanks
+  Check the API:  curl http://localhost:3000/health
+  Lint the project:  pnpm run lint
+
+# files
+  .editorconfig
+  .env.example
+  .gitignore
+  README.md
+  atarashi.json
+  biome.json
+  package.json
+  pnpm-workspace.yaml
+  src/app.ts
+  src/config/env.ts
+  src/index.ts
+  src/lib/async-handler.ts
+  src/lib/http-error.ts
+  src/lib/http.ts
+  src/middlewares/error-handler.ts
+  src/routes/index.ts
+  tsconfig.json
+
+────────────────────────────────────────────────────────────────────────
+FILE .editorconfig  (644)
+────────────────────────────────────────────────────────────────────────
+# https://editorconfig.org
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab
+
+────────────────────────────────────────────────────────────────────────
+FILE .env.example  (644)
+────────────────────────────────────────────────────────────────────────
+# validation/zod
+# Runtime mode: development, test or production
+NODE_ENV=development
+
+# http/express
+# Port the HTTP server listens on
+PORT=3000
+
+────────────────────────────────────────────────────────────────────────
+FILE .gitignore  (644)
+────────────────────────────────────────────────────────────────────────
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.env*
+!.env.example
+*.log
+.DS_Store
+
+────────────────────────────────────────────────────────────────────────
+FILE README.md  (644)
+────────────────────────────────────────────────────────────────────────
+# my-app
+
+A generated project
+
+## Getting started
+
+```sh
+pnpm install
+cp .env.example .env
+pnpm run dev
+```
+
+The server listens on `PORT` (3000 by default). Check it with:
+
+```sh
+curl http://localhost:3000/health
+```
+
+## Scripts
+
+| Script | What it does |
+| --- | --- |
+| `pnpm run dev` | Run the app with reload on change |
+| `pnpm run build` | Compile TypeScript to `dist/` |
+| `pnpm run start` | Run the compiled output |
+| `pnpm run typecheck` | Typecheck without emitting |
+| `pnpm run lint` | Lint the project |
+| `pnpm run format` | Format the project |
+
+## Configuration
+
+Every variable the app needs is listed in `.env.example` and validated at boot
+by `src/config/env.ts`. The process exits immediately if one is missing
+or malformed, so a misconfigured deploy fails loudly instead of at the first
+request.
+
+## Blueprints
+
+This project was composed from:
+
+- `core/node-ts` @ 1.0.0
+- `validation/zod` @ 1.0.0
+- `http/express` @ 1.0.0
+- `mw/error-handler` @ 1.0.0
+- `lint/biome` @ 1.0.0
+- `meta/editorconfig` @ 1.0.0
+- `meta/readme` @ 1.0.0
+
+`atarashi.json` records that selection. Add another capability with:
+
+```sh
+pnpm dlx atarashi add <blueprint>
+```
+
+────────────────────────────────────────────────────────────────────────
+FILE atarashi.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "$schema": "https://unpkg.com/@atarashi/schema/schemas/atarashi.schema.json",
+  "specVersion": 1,
+  "atarashiVersion": "1.0.0",
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "name": "my-app",
+  "blueprints": [
+    {
+      "id": "core/node-ts",
+      "version": "1.0.0"
+    },
+    {
+      "id": "validation/zod",
+      "version": "1.0.0"
+    },
+    {
+      "id": "http/express",
+      "version": "1.0.0"
+    },
+    {
+      "id": "mw/error-handler",
+      "version": "1.0.0"
+    },
+    {
+      "id": "lint/biome",
+      "version": "1.0.0"
+    },
+    {
+      "id": "meta/editorconfig",
+      "version": "1.0.0"
+    },
+    {
+      "id": "meta/readme",
+      "version": "1.0.0"
+    }
+  ],
+  "answers": {
+    "db.name": "my_app"
+  },
+  "options": {
+    "packageManager": "pnpm",
+    "git": true,
+    "install": true,
+    "format": true,
+    "initialCommit": true,
+    "license": "MIT",
+    "author": {
+      "name": "Ada Lovelace",
+      "email": "ada@example.com"
+    },
+    "writeEnv": false,
+    "force": false
+  },
+  "description": "A generated project",
+  "preset": "preset/backend-minimal"
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE biome.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": {
+    "includes": ["**", "!dist/**", "!coverage/**"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": { "quoteStyle": "single", "trailingCommas": "all", "semicolons": "always" }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": { "recommended": true }
+  },
+  "assist": { "actions": { "source": { "organizeImports": "off" } } }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A generated project",
+  "license": "MIT",
+  "author": "Ada Lovelace <ada@example.com>",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.14",
+    "@types/express": "^4.17.23",
+    "@types/node": "^22.19.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE pnpm-workspace.yaml  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "allowBuilds": {
+    "esbuild": true
+  },
+  "onlyBuiltDependencies": [
+    "esbuild"
+  ]
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/app.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import express from 'express';
+
+import { router } from './routes/index.js';
+// #region atarashi:imports
+import { errorHandler } from './middlewares/error-handler.js';
+
+// #endregion
+
+const app = express();
+
+app.disable('x-powered-by');
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true }));
+// #region atarashi:middleware
+// #endregion
+
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime() });
+});
+
+app.use('/api/v1', router);
+// #region atarashi:routes
+// #endregion
+
+app.use((_req, res) => {
+  res.status(404).json({ success: false, error: 'Not found' });
+});
+// #region atarashi:error-handlers
+app.use(errorHandler);
+// #endregion
+
+export { app };
+
+────────────────────────────────────────────────────────────────────────
+FILE src/config/env.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { config } from 'dotenv';
+import { z } from 'zod';
+
+// Loads `.env` when one is present, before anything reads `process.env`. A
+// missing file is not an error: in production the platform supplies the
+// environment, and `dotenv` leaves whatever is already set untouched.
+config({ quiet: true });
+
+/**
+ * The single source of truth for configuration. Every blueprint that needs an
+ * environment variable contributes its line to the region below, so the shape
+ * of `env` always matches `.env.example`.
+ */
+const schema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  // #region atarashi:env-schema
+  PORT: z.coerce.number().int().positive().default(3000),
+  // #endregion
+});
+
+const parsed = schema.safeParse(process.env);
+
+if (!parsed.success) {
+  console.error('Invalid environment variables:');
+  for (const issue of parsed.error.issues) {
+    console.error(`  - ${issue.path.join('.') || '(root)'}: ${issue.message}`);
+  }
+  process.exit(1);
+}
+
+export const env = parsed.data;
+export type Env = typeof env;
+
+────────────────────────────────────────────────────────────────────────
+FILE src/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+// #region atarashi:imports
+import { app } from './app.js';
+import { env } from './config/env.js';
+
+// #endregion
+
+// #region atarashi:bootstrap
+app.listen(env.PORT, () => {
+  console.log(`my-app listening on http://localhost:${env.PORT}`);
+});
+// #endregion
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/async-handler.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
+
+/**
+ * Wraps an async route handler so a rejected promise reaches the error
+ * middleware instead of becoming an unhandled rejection.
+ */
+export const asyncHandler =
+  (handler: RequestHandler): RequestHandler =>
+  (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(handler(req, res, next)).catch(next);
+  };
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/http-error.ts  (644)
+────────────────────────────────────────────────────────────────────────
+/**
+ * The one error type route handlers should throw. Anything else reaching the
+ * handler is treated as a bug and reported as a 500 without leaking details.
+ */
+export class HttpError extends Error {
+  readonly status: number;
+  readonly details: unknown;
+
+  constructor(status: number, message: string, details?: unknown) {
+    super(message);
+    this.name = 'HttpError';
+    this.status = status;
+    this.details = details;
+  }
+
+  static badRequest(message = 'Bad request', details?: unknown) {
+    return new HttpError(400, message, details);
+  }
+
+  static unauthorized(message = 'Authentication required') {
+    return new HttpError(401, message);
+  }
+
+  static forbidden(message = 'Forbidden') {
+    return new HttpError(403, message);
+  }
+
+  static notFound(message = 'Not found') {
+    return new HttpError(404, message);
+  }
+
+  static conflict(message = 'Conflict') {
+    return new HttpError(409, message);
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/http.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import type { Response } from 'express';
+
+export const HttpStatus = Object.freeze({
+  OK: 200,
+  CREATED: 201,
+  NO_CONTENT: 204,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  CONFLICT: 409,
+  UNPROCESSABLE_ENTITY: 422,
+  TOO_MANY_REQUESTS: 429,
+  INTERNAL_SERVER_ERROR: 500,
+});
+
+export type HttpStatusCode = (typeof HttpStatus)[keyof typeof HttpStatus];
+
+export interface ApiSuccess<T> {
+  success: true;
+  data: T;
+}
+
+export interface ApiFailure {
+  success: false;
+  error: string;
+  details?: unknown;
+}
+
+export function sendSuccess<T>(res: Response, data: T, status: number = HttpStatus.OK) {
+  const body: ApiSuccess<T> = { success: true, data };
+  return res.status(status).json(body);
+}
+
+export function sendError(
+  res: Response,
+  error: string,
+  status: number = HttpStatus.INTERNAL_SERVER_ERROR,
+  details?: unknown,
+) {
+  const body: ApiFailure = { success: false, error, ...(details === undefined ? {} : { details }) };
+  return res.status(status).json(body);
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/middlewares/error-handler.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import type { NextFunction, Request, Response } from 'express';
+import { ZodError } from 'zod';
+
+import { env } from '../config/env.js';
+import { HttpError } from '../lib/http-error.js';
+
+/**
+ * Express identifies an error handler by its four parameters, so `next` stays
+ * in the signature even though it is unused on the happy path.
+ */
+export function errorHandler(error: unknown, _req: Request, res: Response, next: NextFunction) {
+  if (res.headersSent) {
+    next(error);
+    return;
+  }
+
+  if (error instanceof ZodError) {
+    res.status(422).json({ success: false, error: 'Validation failed', details: error.issues });
+    return;
+  }
+
+  if (error instanceof HttpError) {
+    res.status(error.status).json({
+      success: false,
+      error: error.message,
+      ...(error.details === undefined ? {} : { details: error.details }),
+    });
+    return;
+  }
+
+  if (env.NODE_ENV !== 'production') {
+    console.error(error);
+  }
+
+  res.status(500).json({ success: false, error: 'Internal server error' });
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/routes/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { Router } from 'express';
+
+/** Mounted at `/api/v1`. Add your feature routers here. */
+export const router = Router();
+
+router.get('/', (_req, res) => {
+  res.json({ success: true, data: { name: 'my-app', version: 1 } });
+});
+
+────────────────────────────────────────────────────────────────────────
+FILE tsconfig.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "src",
+    "outDir": "dist",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "verbatimModuleSyntax": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

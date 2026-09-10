@@ -1,0 +1,13 @@
+{
+    "manifestVersion": 1,
+    "id": "meta/editorconfig",
+    "name": "EditorConfig",
+    "version": "1.0.0",
+    "description": "Editor-agnostic indentation, charset and newline settings so diffs stay clean across machines.",
+    "category": "meta",
+    "tags": ["editorconfig", "meta", "style"],
+    "provides": ["meta:editorconfig"],
+    "priority": 95,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0" },
+    "files": [{ "from": "files/_editorconfig", "to": ".editorconfig" }]
+}

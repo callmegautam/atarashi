@@ -1,0 +1,36 @@
+{
+    "manifestVersion": 1,
+    "id": "obs/morgan-logger",
+    "name": "Morgan request log",
+    "version": "1.0.0",
+    "description": "Human-readable HTTP request logging for Express in development, combined format in production.",
+    "category": "observability",
+    "tags": ["logging", "morgan", "http", "observability"],
+    "provides": ["logging", "logging:morgan"],
+    "conflicts": ["logging"],
+    "requires": ["http:express", "config:env"],
+    "after": ["http/express"],
+    "priority": 65,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "dependencies": { "morgan": "^1.10.1" },
+    "devDependencies": {
+        "@types/morgan": { "version": "^1.9.10", "when": "provides('language:typescript')" }
+    },
+    "contributions": [
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import morgan from 'morgan';"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { env } from './config/env.js';"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "middleware",
+            "value": "app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));"
+        }
+    ]
+}

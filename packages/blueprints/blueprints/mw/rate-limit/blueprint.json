@@ -1,0 +1,57 @@
+{
+    "manifestVersion": 1,
+    "id": "mw/rate-limit",
+    "name": "Rate limiting",
+    "version": "1.0.0",
+    "description": "Per-IP request throttling with standard RateLimit headers, for Express, Fastify or Hono.",
+    "category": "middleware",
+    "tags": ["rate-limit", "throttling", "security", "middleware"],
+    "provides": ["middleware:rate-limit"],
+    "requires": ["http"],
+    "after": ["http/express", "http/fastify", "http/hono"],
+    "priority": 60,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "dependencies": {
+        "express-rate-limit": { "version": "^7.5.1", "when": "has('http/express')" },
+        "@fastify/rate-limit": { "version": "^10.3.0", "when": "has('http/fastify')" },
+        "hono-rate-limiter": { "version": "^0.4.2", "when": "has('http/hono')" }
+    },
+    "contributions": [
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import rateLimit from 'express-rate-limit';",
+            "when": "has('http/express')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "middleware",
+            "value": "app.use(\n  rateLimit({\n    windowMs: 60_000,\n    limit: 100,\n    standardHeaders: 'draft-7',\n    legacyHeaders: false,\n  }),\n);",
+            "when": "has('http/express')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import fastifyRateLimit from '@fastify/rate-limit';",
+            "when": "has('http/fastify')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "middleware",
+            "value": "await app.register(fastifyRateLimit, { max: 100, timeWindow: '1 minute' });",
+            "when": "has('http/fastify')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { rateLimiter } from 'hono-rate-limiter';",
+            "when": "has('http/hono')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "middleware",
+            "value": "app.use(\n  '*',\n  rateLimiter({\n    windowMs: 60_000,\n    limit: 100,\n    keyGenerator: (c) => c.req.header('x-forwarded-for') ?? 'anonymous',\n  }),\n);",
+            "when": "has('http/hono')"
+        }
+    ]
+}

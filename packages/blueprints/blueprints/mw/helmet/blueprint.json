@@ -1,0 +1,56 @@
+{
+    "manifestVersion": 1,
+    "id": "mw/helmet",
+    "name": "Security headers",
+    "version": "1.0.0",
+    "description": "Sensible default security headers (CSP, HSTS, frame options) for Express, Fastify or Hono.",
+    "category": "middleware",
+    "tags": ["helmet", "security", "headers", "middleware"],
+    "provides": ["middleware:security-headers"],
+    "requires": ["http"],
+    "after": ["http/express", "http/fastify", "http/hono"],
+    "priority": 60,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "dependencies": {
+        "helmet": { "version": "^8.1.0", "when": "has('http/express')" },
+        "@fastify/helmet": { "version": "^13.0.2", "when": "has('http/fastify')" }
+    },
+    "contributions": [
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import helmet from 'helmet';",
+            "when": "has('http/express')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "middleware",
+            "value": "app.use(helmet());",
+            "when": "has('http/express')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import fastifyHelmet from '@fastify/helmet';",
+            "when": "has('http/fastify')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "middleware",
+            "value": "await app.register(fastifyHelmet);",
+            "when": "has('http/fastify')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { secureHeaders } from 'hono/secure-headers';",
+            "when": "has('http/hono')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "middleware",
+            "value": "app.use('*', secureHeaders());",
+            "when": "has('http/hono')"
+        }
+    ]
+}

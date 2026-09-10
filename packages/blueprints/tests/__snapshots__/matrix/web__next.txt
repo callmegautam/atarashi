@@ -1,0 +1,156 @@
+# web/next
+
+# dependencies
+
+# files
+  .gitignore  [core/node-ts, web/next]
+  app/globals.css  [web/next]
+  app/layout.tsx  [web/next]
+  app/page.tsx  [web/next]
+  next.config.mjs  [web/next]
+  package.json  [core/node-ts, web/next, atarashi]
+  pnpm-workspace.yaml  [core/node-ts, web/next]
+  postcss.config.mjs  [web/next]
+  tsconfig.json  [web/next]
+
+────────────────────────────────────────────────────────────────────────
+FILE .gitignore  (644)
+────────────────────────────────────────────────────────────────────────
+# core/node-ts
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.env*
+!.env.example
+*.log
+.DS_Store
+
+# web/next
+.next/
+next-env.d.ts
+.vercel
+
+────────────────────────────────────────────────────────────────────────
+FILE app/globals.css  (644)
+────────────────────────────────────────────────────────────────────────
+@import 'tailwindcss';
+
+────────────────────────────────────────────────────────────────────────
+FILE app/layout.tsx  (644)
+────────────────────────────────────────────────────────────────────────
+import type { Metadata } from 'next';
+
+import './globals.css';
+
+export const metadata: Metadata = {
+  title: 'my-app',
+  description: 'Generated with Atarashi',
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body className="bg-slate-950 text-slate-100 antialiased">{children}</body>
+    </html>
+  );
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE app/page.tsx  (644)
+────────────────────────────────────────────────────────────────────────
+export default function Home() {
+  return (
+    <main className="flex min-h-screen items-center justify-center px-6">
+      <section className="max-w-xl space-y-4 text-center">
+        <h1 className="text-4xl font-semibold tracking-tight">my-app</h1>
+        <p className="text-slate-400">
+          Next.js and Tailwind are wired up. Edit{' '}
+          <code className="rounded bg-slate-800 px-1.5 py-0.5 text-sm">app/page.tsx</code> to begin.
+        </p>
+      </section>
+    </main>
+  );
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE next.config.mjs  (644)
+────────────────────────────────────────────────────────────────────────
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+};
+
+export default nextConfig;
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "lint": "next lint",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "^15.5.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.12",
+    "@types/node": "^22.19.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "tailwindcss": "^4.1.12",
+    "typescript": "~5.9.3"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE pnpm-workspace.yaml  (644)
+────────────────────────────────────────────────────────────────────────
+allowBuilds:
+  esbuild: true
+onlyBuiltDependencies:
+  - esbuild
+
+────────────────────────────────────────────────────────────────────────
+FILE postcss.config.mjs  (644)
+────────────────────────────────────────────────────────────────────────
+const config = {
+  plugins: { '@tailwindcss/postcss': {} },
+};
+
+export default config;
+
+────────────────────────────────────────────────────────────────────────
+FILE tsconfig.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
+    "strict": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "plugins": [{ "name": "next" }],
+    "paths": { "@/*": ["./*"] }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

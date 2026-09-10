@@ -1,0 +1,61 @@
+{
+    "manifestVersion": 1,
+    "id": "orm/drizzle",
+    "name": "Drizzle ORM",
+    "version": "1.0.0",
+    "description": "Drizzle ORM wired to the selected SQL database, with a starter schema and drizzle-kit scripts.",
+    "category": "orm",
+    "tags": ["drizzle", "orm", "sql", "typescript"],
+    "provides": ["orm", "orm:drizzle"],
+    "conflicts": ["orm"],
+    "requires": ["database:sql", "language:typescript"],
+    "after": ["db/postgres", "db/mysql", "db/sqlite"],
+    "priority": 40,
+    "engines": {
+        "atarashi": ">=1.0.0-0 <2.0.0",
+        "node": ">=20.11"
+    },
+    "files": [
+        {
+            "from": "files/src/db/index.ts.hbs",
+            "to": "src/db/index.ts"
+        },
+        {
+            "from": "files/src/db/schema.ts.hbs",
+            "to": "src/db/schema.ts"
+        },
+        {
+            "from": "files/drizzle.config.ts.hbs",
+            "to": "drizzle.config.ts"
+        }
+    ],
+    "dependencies": {
+        "drizzle-orm": "^0.44.6"
+    },
+    "devDependencies": {
+        "drizzle-kit": "^0.31.5"
+    },
+    "scripts": {
+        "db:generate": "drizzle-kit generate",
+        "db:push": "drizzle-kit push",
+        "db:migrate": "drizzle-kit migrate",
+        "db:studio": "drizzle-kit studio"
+    },
+    "nextSteps": [
+        "Create the tables:  {{ pm.run }} db:push",
+        "Browse the data:    {{ pm.run }} db:studio"
+    ],
+    "contributions": [
+        {
+            "target": "pnpm-workspace.yaml",
+            "merge": "yaml-deep",
+            "value": {
+                "allowBuilds": {
+                    "esbuild": true
+                },
+                "onlyBuiltDependencies": ["esbuild"]
+            },
+            "when": "pm.name === 'pnpm'"
+        }
+    ]
+}

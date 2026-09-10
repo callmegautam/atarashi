@@ -1,0 +1,18 @@
+import { createPool } from 'mysql2/promise';
+
+import { env } from '../config/env.js';
+
+export const pool = createPool({
+  uri: env.DATABASE_URL,
+  connectionLimit: {{#when "answers.db.pool === false"}}1{{else}}10{{/when}},
+});
+
+/** Fails fast at boot rather than on the first request. */
+export async function checkDatabaseConnection() {
+  const connection = await pool.getConnection();
+  try {
+    await connection.query('SELECT 1');
+  } finally {
+    connection.release();
+  }
+}

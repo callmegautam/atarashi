@@ -1,0 +1,77 @@
+# {{ project.name }}
+
+{{#when "project.description"}}{{ project.description }}
+{{else}}Scaffolded with [Atarashi](https://github.com/callmegautam/atarashi).
+{{/when}}
+
+## Getting started
+
+```sh
+{{ pm.install }}
+{{#when "provides('config:env')"}}cp .env.example .env
+{{/when}}{{ pm.run }} dev
+```
+
+{{#when "provides('http')"}}
+The server listens on `PORT` (3000 by default). Check it with:
+
+```sh
+curl http://localhost:3000/health
+```
+{{/when}}
+
+## Scripts
+
+| Script | What it does |
+| --- | --- |
+{{#when "provides('language:typescript') && (!provides('ui') || provides('http'))"}}
+| `{{ pm.run }} dev` | Run the app with reload on change |
+| `{{ pm.run }} build` | Compile TypeScript to `dist/` |
+| `{{ pm.run }} start` | Run the compiled output |
+| `{{ pm.run }} typecheck` | Typecheck without emitting |
+{{/when}}
+{{#when "provides('language:javascript') && (!provides('ui') || provides('http'))"}}
+| `{{ pm.run }} dev` | Run the app with reload on change |
+| `{{ pm.run }} start` | Run the app |
+{{/when}}
+{{#when "provides('ui') && provides('http')"}}
+| `{{ pm.run }} dev:web` | Run the frontend in `web/` |
+| `{{ pm.run }} build:web` | Build the frontend in `web/` |
+{{/when}}
+{{#when "provides('lint')"}}
+| `{{ pm.run }} lint` | Lint the project |
+| `{{ pm.run }} format` | Format the project |
+{{/when}}
+{{#when "provides('test')"}}
+| `{{ pm.run }} test` | Run the test suite |
+{{/when}}
+{{#when "provides('orm')"}}
+| `{{ pm.run }} db:push` | Apply the schema to the database |
+| `{{ pm.run }} db:studio` | Browse the data |
+{{/when}}
+{{#when "has('infra/docker-compose')"}}
+| `{{ pm.run }} compose:up` | Build and start the whole stack |
+{{/when}}
+
+{{#when "provides('config:env')"}}
+## Configuration
+
+Every variable the app needs is listed in `.env.example` and validated at boot
+by `src/config/env.{{#when "provides('language:typescript')"}}ts{{else}}js{{/when}}`. The process exits immediately if one is missing
+or malformed, so a misconfigured deploy fails loudly instead of at the first
+request.
+{{/when}}
+
+## Blueprints
+
+This project was composed from:
+
+{{#each blueprints}}
+- `{{ id }}` @ {{ version }}
+{{/each}}
+
+`atarashi.json` records that selection. Add another capability with:
+
+```sh
+{{ pm.exec }} atarashi add <blueprint>
+```

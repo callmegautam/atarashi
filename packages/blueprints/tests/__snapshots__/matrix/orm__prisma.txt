@@ -1,0 +1,108 @@
+# orm/prisma
+
+# dependencies
+      @prisma/client@^6.16.2
+  dev prisma@^6.16.2
+
+# files
+  .gitignore  [core/node-ts, orm/prisma]
+  package.json  [core/node-ts, validation/zod, orm/prisma, atarashi]
+  pnpm-workspace.yaml  [core/node-ts, orm/prisma]
+  prisma/schema.prisma  [orm/prisma]
+  src/db/index.ts  [orm/prisma]
+
+────────────────────────────────────────────────────────────────────────
+FILE .gitignore  (644)
+────────────────────────────────────────────────────────────────────────
+# core/node-ts
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.env*
+!.env.example
+*.log
+.DS_Store
+
+# orm/prisma
+prisma/*.db
+prisma/migrations/dev.db*
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "dev": "tsx watch src/index.ts",
+    "postinstall": "prisma generate",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.2",
+    "dotenv": "^17.4.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "prisma": "^6.16.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE pnpm-workspace.yaml  (644)
+────────────────────────────────────────────────────────────────────────
+allowBuilds:
+  esbuild: true
+  "@prisma/client": true
+  "@prisma/engines": true
+  prisma: true
+onlyBuiltDependencies:
+  - esbuild
+  - "@prisma/client"
+  - "@prisma/engines"
+  - prisma
+
+────────────────────────────────────────────────────────────────────────
+FILE prisma/schema.prisma  (644)
+────────────────────────────────────────────────────────────────────────
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// A starter model. Delete it once you have a real one.
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/db/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { PrismaClient } from '@prisma/client';
+
+export const prisma = new PrismaClient();
+
+/** Fails fast at boot rather than on the first query. */
+export async function checkDatabaseConnection() {
+  await prisma.$queryRaw`SELECT 1`;
+}

@@ -1,0 +1,451 @@
+# blueprints
+  core/node-ts@1.0.0
+  validation/zod@1.0.0
+  db/sqlite@1.0.0
+  orm/drizzle@1.0.0
+  http/fastify@1.0.0
+  lint/biome@1.0.0
+  test/vitest@1.0.0
+
+# dependencies
+  better-sqlite3@^13.0.3  (db/sqlite)
+  dotenv@^17.4.2  (validation/zod)
+  drizzle-orm@^0.44.6  (orm/drizzle)
+  fastify@^5.6.1  (http/fastify)
+  zod@^3.25.76  (validation/zod)
+
+# devDependencies
+  @biomejs/biome@^2.3.14  (lint/biome)
+  @types/better-sqlite3@^7.6.13  (db/sqlite)
+  @types/node@^22.19.0  (core/node-ts)
+  @vitest/coverage-v8@^3.2.4  (test/vitest)
+  drizzle-kit@^0.31.5  (orm/drizzle)
+  tsx@^4.20.6  (core/node-ts)
+  typescript@^5.9.3  (core/node-ts)
+  vitest@^3.2.4  (test/vitest)
+
+# next steps
+  Start the dev server:  pnpm run dev
+  Copy `.env.example` to `.env` and fill in the blanks
+  The database file is created on first run under `data/`
+  Create the tables:  pnpm run db:push
+  Browse the data:    pnpm run db:studio
+  Check the API:  curl http://localhost:3000/health
+  Lint the project:  pnpm run lint
+  Run the tests:  pnpm run test
+  Tests read the same environment as the app, so export your .env before running them
+
+# files
+  .env.example
+  .gitignore
+  atarashi.json
+  biome.json
+  drizzle.config.ts
+  package.json
+  pnpm-workspace.yaml
+  src/app.ts
+  src/config/env.ts
+  src/db/client.ts
+  src/db/index.ts
+  src/db/schema.ts
+  src/index.ts
+  tests/health.test.ts
+  tsconfig.json
+  vitest.config.ts
+
+────────────────────────────────────────────────────────────────────────
+FILE .env.example  (644)
+────────────────────────────────────────────────────────────────────────
+# validation/zod
+# Runtime mode: development, test or production
+NODE_ENV=development
+
+# db/sqlite
+# SQLite database file, as a `file:` URL
+DATABASE_URL=file:./data/my_app.db
+
+# http/fastify
+# Port the HTTP server listens on
+PORT=3000
+
+────────────────────────────────────────────────────────────────────────
+FILE .gitignore  (644)
+────────────────────────────────────────────────────────────────────────
+# core/node-ts
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.env*
+!.env.example
+*.log
+.DS_Store
+
+# db/sqlite
+data/
+*.db
+*.db-shm
+*.db-wal
+
+────────────────────────────────────────────────────────────────────────
+FILE atarashi.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "$schema": "https://unpkg.com/@atarashi/schema/schemas/atarashi.schema.json",
+  "specVersion": 1,
+  "atarashiVersion": "1.0.0",
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "name": "my-app",
+  "blueprints": [
+    {
+      "id": "core/node-ts",
+      "version": "1.0.0"
+    },
+    {
+      "id": "validation/zod",
+      "version": "1.0.0"
+    },
+    {
+      "id": "db/sqlite",
+      "version": "1.0.0"
+    },
+    {
+      "id": "orm/drizzle",
+      "version": "1.0.0"
+    },
+    {
+      "id": "http/fastify",
+      "version": "1.0.0"
+    },
+    {
+      "id": "lint/biome",
+      "version": "1.0.0"
+    },
+    {
+      "id": "test/vitest",
+      "version": "1.0.0"
+    }
+  ],
+  "answers": {
+    "auth.expiry": "7d",
+    "db.name": "my_app",
+    "db.pool": true
+  },
+  "options": {
+    "packageManager": "pnpm",
+    "git": true,
+    "install": true,
+    "format": true,
+    "initialCommit": true,
+    "license": "MIT",
+    "author": {
+      "name": "Ada Lovelace",
+      "email": "ada@example.com"
+    },
+    "writeEnv": false,
+    "force": false
+  },
+  "description": "A generated project"
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE biome.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": {
+    "includes": ["**", "!dist/**", "!coverage/**"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": { "quoteStyle": "single", "trailingCommas": "all", "semicolons": "always" }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": { "recommended": true }
+  },
+  "assist": { "actions": { "source": { "organizeImports": "off" } } }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE drizzle.config.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { defineConfig } from 'drizzle-kit';
+
+/**
+ * drizzle-kit loads this file with its own bundler, outside the app's module
+ * graph, so it reads the environment directly rather than importing `env`.
+ */
+const url = process.env.DATABASE_URL;
+
+if (!url) {
+  throw new Error('DATABASE_URL is not set; drizzle-kit cannot connect.');
+}
+
+export default defineConfig({
+  schema: './src/db/schema.ts',
+  out: './drizzle',
+  dialect: 'sqlite',
+  dbCredentials: { url },
+  migrations: {
+    table: '__drizzle_migrations',
+  },
+});
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A generated project",
+  "license": "MIT",
+  "author": "Ada Lovelace <ada@example.com>",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "dev": "tsx watch src/index.ts",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "^0.44.6",
+    "fastify": "^5.6.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.14",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22.19.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "drizzle-kit": "^0.31.5",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE pnpm-workspace.yaml  (644)
+────────────────────────────────────────────────────────────────────────
+allowBuilds:
+  esbuild: true
+  better-sqlite3: true
+onlyBuiltDependencies:
+  - esbuild
+  - better-sqlite3
+
+────────────────────────────────────────────────────────────────────────
+FILE src/app.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import Fastify from 'fastify';
+// #region atarashi:imports
+// #endregion
+
+export const app = Fastify({ logger: true });
+
+// #region atarashi:middleware
+// #endregion
+
+app.get('/health', async () => ({ status: 'ok', uptime: process.uptime() }));
+
+app.get('/api/v1', async () => ({
+  success: true,
+  data: { name: 'my-app', version: 1 },
+}));
+// #region atarashi:routes
+// #endregion
+
+app.setNotFoundHandler(async (_request, reply) => {
+  return reply.status(404).send({ success: false, error: 'Not found' });
+});
+// #region atarashi:error-handlers
+// #endregion
+
+────────────────────────────────────────────────────────────────────────
+FILE src/config/env.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { config } from 'dotenv';
+import { z } from 'zod';
+
+// Loads `.env` when one is present, before anything reads `process.env`. A
+// missing file is not an error: in production the platform supplies the
+// environment, and `dotenv` leaves whatever is already set untouched.
+config({ quiet: true });
+
+/**
+ * The single source of truth for configuration. Every blueprint that needs an
+ * environment variable contributes its line to the region below, so the shape
+ * of `env` always matches `.env.example`.
+ */
+const schema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  // #region atarashi:env-schema
+  DATABASE_URL: z.string().min(1),
+  PORT: z.coerce.number().int().positive().default(3000),
+  // #endregion
+});
+
+const parsed = schema.safeParse(process.env);
+
+if (!parsed.success) {
+  console.error('Invalid environment variables:');
+  for (const issue of parsed.error.issues) {
+    console.error(`  - ${issue.path.join('.') || '(root)'}: ${issue.message}`);
+  }
+  process.exit(1);
+}
+
+export const env = parsed.data;
+export type Env = typeof env;
+
+────────────────────────────────────────────────────────────────────────
+FILE src/db/client.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
+
+import Database from 'better-sqlite3';
+
+import { env } from '../config/env.js';
+
+/** `file:./data/app.db` and `./data/app.db` both mean the same local file. */
+const file = env.DATABASE_URL.replace(/^file:/, '');
+
+mkdirSync(dirname(file), { recursive: true });
+
+export const database = new Database(file);
+
+database.pragma('journal_mode = WAL');
+database.pragma('foreign_keys = ON');
+
+/** Fails fast at boot rather than on the first request. */
+export function checkDatabaseConnection() {
+  database.prepare('SELECT 1').get();
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/db/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+
+import { database } from './client.js';
+import * as schema from './schema.js';
+
+export const db = drizzle(database, { schema });
+
+export type Database = typeof db;
+
+────────────────────────────────────────────────────────────────────────
+FILE src/db/schema.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+
+/** A starter table. Delete it once you have a real one. */
+export const users = sqliteTable('users', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  email: text('email').notNull().unique(),
+  createdAt: integer('created_at', { mode: 'timestamp' })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }),
+});
+
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+
+────────────────────────────────────────────────────────────────────────
+FILE src/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+// #region atarashi:imports
+import { checkDatabaseConnection } from './db/client.js';
+import { app } from './app.js';
+import { env } from './config/env.js';
+
+// #endregion
+
+// #region atarashi:bootstrap
+checkDatabaseConnection();
+await app.listen({ port: env.PORT, host: '0.0.0.0' });
+// #endregion
+
+────────────────────────────────────────────────────────────────────────
+FILE tests/health.test.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { describe, expect, it } from 'vitest';
+
+import { app } from '../src/app.js';
+
+describe('GET /health', () => {
+  it('reports the service as healthy', async () => {
+    const response = await app.inject({ method: 'GET', url: '/health' });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json().status).toBe('ok');
+  });
+});
+
+────────────────────────────────────────────────────────────────────────
+FILE tsconfig.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "src",
+    "outDir": "dist",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "verbatimModuleSyntax": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE vitest.config.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    environment: 'node',
+    // A new project has no tests yet; that is not a failure.
+    passWithNoTests: true,
+    include: ['tests/**/*.test.ts'],
+    coverage: {
+      provider: 'v8',
+      include: ['src/**'],
+      reporter: ['text', 'lcov'],
+    },
+  },
+});

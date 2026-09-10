@@ -1,0 +1,14 @@
+import pino from 'pino';
+
+import { env } from '../config/env.js';
+
+/**
+ * Pretty, colourised lines while developing; newline-delimited JSON in
+ * production, where a log shipper is reading them.
+ */
+export const logger = pino({
+  level: env.LOG_LEVEL,
+  ...(env.NODE_ENV === 'production'
+    ? {}
+    : { transport: { target: 'pino-pretty', options: { colorize: true } } }),
+});

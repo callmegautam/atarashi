@@ -1,0 +1,29 @@
+{
+    "name": "@atarashi/testing",
+    "version": "0.0.0",
+    "private": true,
+    "description": "Internal snapshot harness, matrix runner and virtual-FS assertions.",
+    "type": "module",
+    "license": "MIT",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "engines": {
+        "node": ">=20.11"
+    },
+    "scripts": {
+        "build": "tsup",
+        "typecheck": "tsc --noEmit -p tsconfig.json",
+        "test": "vitest run --passWithNoTests",
+        "clean": "rm -rf dist .turbo"
+    },
+    "dependencies": {
+        "@atarashi/plugin-kit": "workspace:*",
+        "@atarashi/schema": "workspace:*"
+    }
+}

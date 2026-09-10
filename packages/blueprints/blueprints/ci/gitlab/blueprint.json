@@ -1,0 +1,17 @@
+{
+    "manifestVersion": 1,
+    "id": "ci/gitlab",
+    "name": "GitLab CI",
+    "version": "1.0.0",
+    "description": "A GitLab pipeline that installs, lints, typechecks, builds and tests with a cached dependency store.",
+    "category": "ci",
+    "tags": ["ci", "gitlab", "automation"],
+    "provides": ["ci", "ci:gitlab"],
+    "conflicts": ["ci"],
+    "requires": ["runtime:node"],
+    "after": ["lint/eslint-prettier", "lint/biome", "test/vitest", "test/jest"],
+    "priority": 85,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "files": [{ "from": "files/_gitlab-ci.yml.hbs", "to": ".gitlab-ci.yml", "merge": "yaml-deep" }],
+    "nextSteps": ["Push a branch to see the pipeline run"]
+}

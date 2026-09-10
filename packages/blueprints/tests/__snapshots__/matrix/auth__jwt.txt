@@ -1,0 +1,143 @@
+# auth/jwt
+
+# dependencies
+  dev @types/bcryptjs@^3.0.0
+  dev @types/cookie-parser@^1.4.9
+  dev @types/jsonwebtoken@^9.0.10
+      bcryptjs@^3.0.2
+      cookie-parser@^1.4.7
+      jsonwebtoken@^9.0.2
+
+# files
+  .env.example  [validation/zod, http/express, auth/jwt]
+  package.json  [core/node-ts, validation/zod, http/express, auth/jwt, atarashi]
+  src/lib/jwt.ts  [auth/jwt]
+  src/lib/password.ts  [auth/jwt]
+  src/middlewares/auth.ts  [auth/jwt]
+
+────────────────────────────────────────────────────────────────────────
+FILE .env.example  (644)
+────────────────────────────────────────────────────────────────────────
+# validation/zod
+# Runtime mode: development, test or production
+NODE_ENV=development
+
+# http/express
+# Port the HTTP server listens on
+PORT=3000
+
+# auth/jwt
+# Signing key for access tokens; at least 32 characters
+JWT_SECRET=
+# Access token lifetime, e.g. 30m, 12h, 7d
+JWT_EXPIRES_IN=7d
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/express": "^4.17.23",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^22.19.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/jwt.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import jwt from 'jsonwebtoken';
+import type { SignOptions } from 'jsonwebtoken';
+
+import { env } from '../config/env.js';
+
+export interface TokenPayload {
+  /** The subject — normally the user id. */
+  sub: string;
+  [claim: string]: unknown;
+}
+
+export function signToken(payload: TokenPayload, options: SignOptions = {}): string {
+  return jwt.sign(payload, env.JWT_SECRET, {
+    expiresIn: env.JWT_EXPIRES_IN as SignOptions['expiresIn'],
+    ...options,
+  });
+}
+
+export function verifyToken(token: string): TokenPayload {
+  return jwt.verify(token, env.JWT_SECRET) as TokenPayload;
+}
+
+export function decodeToken(token: string): TokenPayload | null {
+  return jwt.decode(token) as TokenPayload | null;
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/password.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import bcrypt from 'bcryptjs';
+
+const ROUNDS = 12;
+
+export function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, ROUNDS);
+}
+
+export function verifyPassword(password: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(password, hash);
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/middlewares/auth.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import type { NextFunction, Request, Response } from 'express';
+
+import { HttpStatus, sendError } from '../lib/http.js';
+import { verifyToken } from '../lib/jwt.js';
+import type { TokenPayload } from '../lib/jwt.js';
+
+export interface AuthenticatedRequest extends Request {
+  user?: TokenPayload;
+}
+
+/** Accepts `Authorization: Bearer <token>` first, then a `token` cookie. */
+export function requireAuth(req: Request, res: Response, next: NextFunction) {
+  const header = req.headers.authorization;
+  const bearer = header?.startsWith('Bearer ') ? header.slice('Bearer '.length) : undefined;
+  const token = bearer ?? (req.cookies?.token as string | undefined);
+
+  if (!token) {
+    sendError(res, 'Authentication required', HttpStatus.UNAUTHORIZED);
+    return;
+  }
+
+  try {
+    (req as AuthenticatedRequest).user = verifyToken(token);
+    next();
+  } catch {
+    sendError(res, 'Invalid or expired token', HttpStatus.UNAUTHORIZED);
+  }
+}

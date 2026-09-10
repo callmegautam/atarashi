@@ -1,0 +1,438 @@
+# blueprints
+  core/node-ts@1.0.0
+  web/angular-tailwind@1.0.0
+  meta/editorconfig@1.0.0
+  meta/readme@1.0.0
+
+# dependencies
+
+# devDependencies
+  @types/node@^22.19.0  (core/node-ts)
+  typescript@^5.9.3  (core/node-ts)
+
+# next steps
+  Start the dev server:  pnpm run dev
+  Start the Angular dev server:  pnpm run dev
+
+# files
+  .editorconfig
+  .gitignore
+  .postcssrc.json
+  README.md
+  angular.json
+  atarashi.json
+  package.json
+  pnpm-workspace.yaml
+  public/favicon.ico
+  src/app/app.config.ts
+  src/app/app.css
+  src/app/app.html
+  src/app/app.routes.ts
+  src/app/app.spec.ts
+  src/app/app.ts
+  src/index.html
+  src/main.ts
+  src/styles.css
+  tsconfig.app.json
+  tsconfig.json
+  tsconfig.spec.json
+
+────────────────────────────────────────────────────────────────────────
+FILE .editorconfig  (644)
+────────────────────────────────────────────────────────────────────────
+# https://editorconfig.org
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab
+
+────────────────────────────────────────────────────────────────────────
+FILE .gitignore  (644)
+────────────────────────────────────────────────────────────────────────
+# core/node-ts
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.env*
+!.env.example
+*.log
+.DS_Store
+
+# web/angular-tailwind
+.angular/
+out-tsc/
+
+────────────────────────────────────────────────────────────────────────
+FILE .postcssrc.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "plugins": {
+    "@tailwindcss/postcss": {}
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE README.md  (644)
+────────────────────────────────────────────────────────────────────────
+# angular-tailwind
+
+Scaffolded with [Atarashi](https://github.com/callmegautam/atarashi).
+
+## Getting started
+
+```sh
+pnpm install
+pnpm run dev
+```
+
+
+## Scripts
+
+| Script | What it does |
+| --- | --- |
+
+
+## Blueprints
+
+This project was composed from:
+
+- `core/node-ts` @ 1.0.0
+- `web/angular-tailwind` @ 1.0.0
+- `meta/editorconfig` @ 1.0.0
+- `meta/readme` @ 1.0.0
+
+`atarashi.json` records that selection. Add another capability with:
+
+```sh
+pnpm dlx atarashi add <blueprint>
+```
+
+────────────────────────────────────────────────────────────────────────
+FILE angular.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "angular-tailwind": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "src/main.ts",
+            "tsConfig": "tsconfig.app.json",
+            "assets": [{ "glob": "**/*", "input": "public" }],
+            "styles": ["src/styles.css"]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                { "type": "initial", "maximumWarning": "500kB", "maximumError": "1MB" },
+                { "type": "anyComponentStyle", "maximumWarning": "4kB", "maximumError": "8kB" }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": { "buildTarget": "angular-tailwind:build:production" },
+            "development": { "buildTarget": "angular-tailwind:build:development" }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test"
+        }
+      }
+    }
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE atarashi.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "$schema": "https://unpkg.com/@atarashi/schema/schemas/atarashi.schema.json",
+  "specVersion": 1,
+  "atarashiVersion": "1.0.0",
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "name": "angular-tailwind",
+  "blueprints": [
+    {
+      "id": "core/node-ts",
+      "version": "1.0.0"
+    },
+    {
+      "id": "web/angular-tailwind",
+      "version": "1.0.0"
+    },
+    {
+      "id": "meta/editorconfig",
+      "version": "1.0.0"
+    },
+    {
+      "id": "meta/readme",
+      "version": "1.0.0"
+    }
+  ],
+  "answers": {
+    "auth.expiry": "7d",
+    "db.name": "my_app",
+    "db.pool": true
+  },
+  "options": {
+    "packageManager": "pnpm",
+    "git": true,
+    "install": true,
+    "format": true,
+    "initialCommit": true,
+    "license": "MIT",
+    "author": null,
+    "writeEnv": false,
+    "force": false
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "angular-tailwind",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "ng build",
+    "dev": "ng serve",
+    "start": "ng serve",
+    "test": "ng test",
+    "watch": "ng build --watch --configuration development"
+  },
+  "dependencies": {
+    "@angular/common": "^21.0.0",
+    "@angular/compiler": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/forms": "^21.0.0",
+    "@angular/platform-browser": "^21.0.0",
+    "@angular/router": "^21.0.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.8.1"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.0.2",
+    "@angular/cli": "^21.0.2",
+    "@angular/compiler-cli": "^21.0.0",
+    "@tailwindcss/postcss": "^4.1.12",
+    "@types/node": "^22.19.0",
+    "jsdom": "^27.1.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.12",
+    "typescript": "~5.9.3",
+    "vitest": "^4.0.8"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE pnpm-workspace.yaml  (644)
+────────────────────────────────────────────────────────────────────────
+allowBuilds:
+  esbuild: true
+onlyBuiltDependencies:
+  - esbuild
+
+────────────────────────────────────────────────────────────────────────
+FILE public/favicon.ico  (644)
+────────────────────────────────────────────────────────────────────────
+<binary, 15086 bytes>
+
+────────────────────────────────────────────────────────────────────────
+FILE src/app/app.config.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideRouter } from '@angular/router';
+
+import { routes } from './app.routes';
+
+export const appConfig: ApplicationConfig = {
+  providers: [provideBrowserGlobalErrorListeners(), provideRouter(routes)],
+};
+
+────────────────────────────────────────────────────────────────────────
+FILE src/app/app.css  (644)
+────────────────────────────────────────────────────────────────────────
+
+
+────────────────────────────────────────────────────────────────────────
+FILE src/app/app.html  (644)
+────────────────────────────────────────────────────────────────────────
+<main class="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-6">
+  <section class="max-w-xl text-center space-y-4">
+    <h1 class="text-4xl font-semibold tracking-tight"> title() </h1>
+    <p class="text-slate-400">
+      Angular and Tailwind are wired up. Edit
+      <code class="rounded bg-slate-800 px-1.5 py-0.5 text-sm">src/app/app.html</code> to begin.
+    </p>
+  </section>
+</main>
+
+<router-outlet />
+
+────────────────────────────────────────────────────────────────────────
+FILE src/app/app.routes.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [];
+
+────────────────────────────────────────────────────────────────────────
+FILE src/app/app.spec.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { TestBed } from '@angular/core/testing';
+
+import { App } from './app';
+
+describe('App', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({ imports: [App] }).compileComponents();
+  });
+
+  it('creates the app', () => {
+    const fixture = TestBed.createComponent(App);
+    expect(fixture.componentInstance).toBeTruthy();
+  });
+
+  it('renders the project title', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('h1')?.textContent).toContain('angular-tailwind');
+  });
+});
+
+────────────────────────────────────────────────────────────────────────
+FILE src/app/app.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { Component, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+
+@Component({
+  selector: 'app-root',
+  imports: [RouterOutlet],
+  templateUrl: './app.html',
+  styleUrl: './app.css',
+})
+export class App {
+  protected readonly title = signal('angular-tailwind');
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/index.html  (644)
+────────────────────────────────────────────────────────────────────────
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>angular-tailwind</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  </head>
+  <body>
+    <app-root></app-root>
+  </body>
+</html>
+
+────────────────────────────────────────────────────────────────────────
+FILE src/main.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { bootstrapApplication } from '@angular/platform-browser';
+
+import { App } from './app/app';
+import { appConfig } from './app/app.config';
+
+bootstrapApplication(App, appConfig).catch((error) => console.error(error));
+
+────────────────────────────────────────────────────────────────────────
+FILE src/styles.css  (644)
+────────────────────────────────────────────────────────────────────────
+@import 'tailwindcss';
+
+────────────────────────────────────────────────────────────────────────
+FILE tsconfig.app.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/app",
+    "types": []
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts"]
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE tsconfig.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "preserve"
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  },
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.spec.json" }]
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE tsconfig.spec.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec",
+    "types": ["vitest/globals"]
+  },
+  "include": ["src/**/*.d.ts", "src/**/*.spec.ts"]
+}

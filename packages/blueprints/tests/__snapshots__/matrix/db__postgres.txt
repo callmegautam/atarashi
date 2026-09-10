@@ -1,0 +1,71 @@
+# db/postgres
+
+# dependencies
+  dev @types/pg@^8.15.5
+      pg@^8.16.3
+
+# files
+  .env.example  [validation/zod, db/postgres]
+  package.json  [core/node-ts, validation/zod, db/postgres, atarashi]
+  src/db/client.ts  [db/postgres]
+
+────────────────────────────────────────────────────────────────────────
+FILE .env.example  (644)
+────────────────────────────────────────────────────────────────────────
+# validation/zod
+# Runtime mode: development, test or production
+NODE_ENV=development
+
+# db/postgres
+# PostgreSQL connection string
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/my_app
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "pg": "^8.16.3",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "@types/pg": "^8.15.5",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/db/client.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { Pool } from 'pg';
+
+import { env } from '../config/env.js';
+
+export const pool = new Pool({
+  connectionString: env.DATABASE_URL,
+  max: 10,
+});
+
+/** Fails fast at boot rather than on the first request. */
+export async function checkDatabaseConnection() {
+  const client = await pool.connect();
+  try {
+    await client.query('SELECT 1');
+  } finally {
+    client.release();
+  }
+}

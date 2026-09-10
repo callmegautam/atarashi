@@ -1,0 +1,32 @@
+{
+    "manifestVersion": 1,
+    "kind": "preset",
+    "id": "preset/backend-ts",
+    "name": "TypeScript REST API",
+    "version": "1.0.0",
+    "description": "Express + PostgreSQL + Drizzle + JWT + Docker, in strict TypeScript.",
+    "recommended": true,
+    "tags": ["backend", "typescript", "express", "postgres"],
+    "blueprints": [
+        "core/node-ts",
+        "validation/zod",
+        "db/postgres",
+        "orm/drizzle",
+        "http/express",
+        "mw/cors",
+        "mw/helmet",
+        "mw/error-handler",
+        "mw/rate-limit",
+        "obs/pino",
+        "auth/jwt",
+        "infra/docker",
+        "infra/docker-compose",
+        "lint/eslint-prettier",
+        "test/vitest",
+        "ci/github",
+        "meta/readme",
+        "meta/license",
+        "meta/editorconfig"
+    ],
+    "answers": { "db.pool": true, "auth.expiry": "7d" }
+}

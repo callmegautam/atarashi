@@ -1,0 +1,89 @@
+{
+    "manifestVersion": 1,
+    "id": "db/postgres",
+    "name": "PostgreSQL",
+    "version": "1.0.0",
+    "description": "PostgreSQL connection pool with a startup health check and a Compose service.",
+    "category": "database",
+    "tags": ["sql", "postgres", "postgresql", "database"],
+    "provides": ["database", "database:sql", "database:postgres"],
+    "conflicts": ["database"],
+    "requires": ["runtime:node", "config:env"],
+    "optionalPeers": ["orm/drizzle", "orm/prisma"],
+    "after": ["core/node-ts", "core/node-js", "validation/zod"],
+    "priority": 30,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "prompts": [
+        {
+            "name": "db.name",
+            "type": "input",
+            "message": "Database name",
+            "default": "{{ project.slug }}",
+            "flag": "--db-name",
+            "validate": {
+                "pattern": "^[a-z][a-z0-9_]*$",
+                "message": "lowercase letters, digits and underscores"
+            }
+        },
+        {
+            "name": "db.pool",
+            "type": "confirm",
+            "message": "Use a connection pool?",
+            "default": true,
+            "flag": "--db-pool"
+        }
+    ],
+    "files": [
+        {
+            "from": "files/src/db/client.ts.hbs",
+            "to": "src/db/client.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "when": "!has('orm/prisma')"
+        },
+        {
+            "from": "files/docker-compose.yml.hbs",
+            "to": "docker-compose.yml",
+            "when": "has('infra/docker-compose')",
+            "merge": "yaml-deep"
+        }
+    ],
+    "dependencies": {
+        "pg": { "version": "^8.16.3", "when": "!has('orm/prisma')" }
+    },
+    "devDependencies": {
+        "@types/pg": {
+            "version": "^8.15.5",
+            "when": "provides('language:typescript') && !has('orm/prisma')"
+        }
+    },
+    "scripts": {
+        "db:up": { "value": "docker compose up -d db", "when": "has('infra/docker-compose')" }
+    },
+    "env": [
+        {
+            "key": "DATABASE_URL",
+            "sample": "postgresql://postgres:postgres@localhost:5432/{{#when \"answers.db.name\"}}{{expr \"answers.db.name\"}}{{else}}{{ project.slug }}{{/when}}",
+            "description": "PostgreSQL connection string",
+            "required": true
+        }
+    ],
+    "contributions": [
+        {
+            "target": "src/config/env.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "env-schema",
+            "value": "DATABASE_URL: z.string().min(1),"
+        },
+        {
+            "target": "src/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { checkDatabaseConnection } from './db/client.js';",
+            "when": "!has('orm/prisma')"
+        },
+        {
+            "target": "src/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "bootstrap",
+            "value": "await checkDatabaseConnection();",
+            "when": "!has('orm/prisma')"
+        }
+    ],
+    "nextSteps": ["Start PostgreSQL:  {{ pm.run }} db:up", "Set DATABASE_URL in .env"]
+}

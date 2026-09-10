@@ -1,0 +1,50 @@
+{
+    "name": "@atarashi/plugin-kit",
+    "version": "1.0.0",
+    "description": "Types and test helpers for third-party Atarashi blueprint authors.",
+    "type": "module",
+    "license": "MIT",
+    "author": "Gautam Suthar <iamgautamsuthar@gmail.com> (https://www.github.com/callmegautam)",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/callmegautam/atarashi.git",
+        "directory": "packages/plugin-kit"
+    },
+    "homepage": "https://github.com/callmegautam/atarashi/tree/main/packages/plugin-kit#readme",
+    "bugs": {
+        "url": "https://github.com/callmegautam/atarashi/issues"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./package.json": "./package.json"
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "engines": {
+        "node": ">=20.11"
+    },
+    "scripts": {
+        "build": "tsup",
+        "typecheck": "tsc --noEmit -p tsconfig.json",
+        "test": "vitest run --coverage",
+        "clean": "rm -rf dist .turbo"
+    },
+    "dependencies": {
+        "@atarashi/core": "workspace:*",
+        "@atarashi/registry": "workspace:*",
+        "@atarashi/schema": "workspace:*",
+        "handlebars": "^4.7.8",
+        "zod": "^3.25.76"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

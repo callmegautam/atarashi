@@ -1,0 +1,37 @@
+# ci/github
+
+# dependencies
+
+# files
+  .github/workflows/ci.yml  [ci/github]
+
+────────────────────────────────────────────────────────────────────────
+FILE .github/workflows/ci.yml  (644)
+────────────────────────────────────────────────────────────────────────
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # gitleaks scans history, not just the tip.
+          fetch-depth: 0
+      # Doc 09 § T5: a committed `.env` is the leak this catches. The CLI in a
+      # container rather than the action, so it needs no token and no licence.
+      - name: Scan for committed secrets
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest detect --source /repo --redact --verbose
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      - run: pnpm install
+      - run: pnpm run typecheck
+      - run: pnpm run build
