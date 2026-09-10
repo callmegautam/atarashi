@@ -165,6 +165,7 @@ Guide: [Authoring blueprints](./docs/guide/authoring-blueprints.md).
 | [Troubleshooting](./docs/guide/troubleshooting.md) | When something goes wrong |
 | [Authoring blueprints](./docs/guide/authoring-blueprints.md) | Writing and publishing one |
 | [Plugin API](./docs/guide/plugin-api.md) | `@atarashi/plugin-kit` in detail |
+| [Migrating from v0.6](./MIGRATION.md) | Old template names, and what replaced them |
 
 ## Upgrading from v0.6
 
@@ -175,7 +176,8 @@ and tells you what it now maps to:
 atarashi new my-api --preset backend-mongo
 ```
 
-The old preset names are accepted for one minor cycle with a notice.
+The old preset names are accepted for one minor cycle with a notice. The full
+mapping, and what changed underneath, is in [MIGRATION.md](./MIGRATION.md).
 
 ## Contributing
 

@@ -7,6 +7,8 @@ and how to author your own.
 
 - **[Getting started](./getting-started.md)**: the 30-second version, then the
   ideas underneath it.
+- **[Migrating from v0.6](../../MIGRATION.md)**: what each old template name
+  maps to, and what changed underneath.
 
 ## Reference
 
