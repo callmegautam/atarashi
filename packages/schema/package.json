@@ -43,8 +43,7 @@
         "zod": "^3.25.76"
     },
     "publishConfig": {
-        "access": "public",
-        "provenance": true
+        "access": "public"
     },
     "devDependencies": {
         "zod-to-json-schema": "^3.24.6"

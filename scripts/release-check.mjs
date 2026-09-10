@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Every quality gate from doc 08, in one command, in dependency order. This is
-// what runs before `changeset version && changeset publish` — nothing runs on
-// GitHub, so the gate is the thing a human runs locally and reads.
+// what runs before `changeset version && changeset publish`. CI runs the same
+// gates on every push, but publishing is manual, so this is the one a human
+// runs and reads before typing `pnpm release`.
 //
 //   pnpm release:check            everything except the database-backed e2e
 //   pnpm release:check --db       including those (needs docker compose)

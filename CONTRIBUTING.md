@@ -42,9 +42,9 @@ Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`).
 Feature work goes on `feat/*` and is squash-merged. If your change affects a
 published package, run `pnpm changeset` and commit the generated file.
 
-Releases are automated: changesets on `main` open a "Version Packages" PR, and
-merging it publishes to npm with provenance. Maintainers can run every gate in
-one command first with `pnpm release:check`.
+Releasing is manual and maintainer-only: `pnpm release:check` runs every gate in
+one command, then `pnpm version-packages` writes the versions and changelogs and
+`pnpm release` publishes. CI never publishes.
 
 ## Before you open a PR
 
