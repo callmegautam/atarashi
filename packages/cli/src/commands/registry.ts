@@ -169,7 +169,7 @@ export async function runRegistry(
                 const sources = userConfig.registry?.sources ?? [
                     {
                         name: 'atarashi',
-                        url: 'https://registry.atarashi.dev',
+                        url: 'https://atarashi.gautamsuthar.in/registry',
                         trusted: true,
                         enabled: true,
                     },

@@ -16,9 +16,13 @@ async function setup(options: Parameters<typeof makeIndex>[0] = [], indexOptions
 
 describe('transport', () => {
     it('refuses plaintext HTTP and unknown protocols', () => {
-        expect(() => assertFetchable('https://registry.atarashi.dev')).not.toThrow();
-        expect(() => assertFetchable('http://registry.atarashi.dev')).toThrow(/plain HTTP/);
-        expect(() => assertFetchable('ftp://registry.atarashi.dev')).toThrow(/Unsupported/);
+        expect(() => assertFetchable('https://atarashi.gautamsuthar.in/registry')).not.toThrow();
+        expect(() => assertFetchable('http://atarashi.gautamsuthar.in/registry')).toThrow(
+            /plain HTTP/
+        );
+        expect(() => assertFetchable('ftp://atarashi.gautamsuthar.in/registry')).toThrow(
+            /Unsupported/
+        );
         expect(() => assertFetchable('not a url')).toThrow(/not a valid/);
     });
 

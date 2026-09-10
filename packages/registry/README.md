@@ -17,7 +17,7 @@ const plan = await generate(spec, { source: registry, atarashiVersion });
 |---|---|---|
 | Local | `./.atarashi/blueprints/<ns>/<name>/blueprint.json` | Untrusted |
 | npm | `atarashi-blueprint-*` packages, by `npm:` spec | Untrusted |
-| Registry | `registry.atarashi.dev`, verified and cached | Per source |
+| Registry | `atarashi.gautamsuthar.in/registry`, verified and cached | Per source |
 | Bundled | `@atarashi/blueprints`, inside the npm package | Trusted |
 
 Local wins outright, so an author can override anything while developing. Then

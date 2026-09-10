@@ -2,7 +2,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 
 /** The default public registry. Overridable per-run and per-source. */
-export const DEFAULT_REGISTRY_URL = 'https://registry.atarashi.dev';
+export const DEFAULT_REGISTRY_URL = 'https://atarashi.gautamsuthar.in/registry';
 
 /** The index is re-checked at most once a day; pinned versions are immutable. */
 export const DEFAULT_TTL_MS = 24 * 60 * 60 * 1000;
