@@ -1,0 +1,75 @@
+# obs/pino
+
+# dependencies
+      pino@^9.13.1
+      pino-http@^10.5.0
+  dev pino-pretty@^13.1.2
+
+# files
+  .env.example  [validation/zod, http/express, obs/pino]
+  package.json  [core/node-ts, validation/zod, http/express, obs/pino, atarashi]
+  src/lib/logger.ts  [obs/pino]
+
+────────────────────────────────────────────────────────────────────────
+FILE .env.example  (644)
+────────────────────────────────────────────────────────────────────────
+# validation/zod
+# Runtime mode: development, test or production
+NODE_ENV=development
+
+# http/express
+# Port the HTTP server listens on
+PORT=3000
+
+# obs/pino
+# Pino log level: trace, debug, info, warn, error or fatal
+LOG_LEVEL=info
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "pino": "^9.13.1",
+    "pino-http": "^10.5.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.23",
+    "@types/node": "^22.19.0",
+    "pino-pretty": "^13.1.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/logger.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import pino from 'pino';
+
+import { env } from '../config/env.js';
+
+/**
+ * Pretty, colourised lines while developing; newline-delimited JSON in
+ * production, where a log shipper is reading them.
+ */
+export const logger = pino({
+  level: env.LOG_LEVEL,
+  ...(env.NODE_ENV === 'production'
+    ? {}
+    : { transport: { target: 'pino-pretty', options: { colorize: true } } }),
+});

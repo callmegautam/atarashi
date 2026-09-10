@@ -1,0 +1,60 @@
+# lint/biome
+
+# dependencies
+  dev @biomejs/biome@^2.3.14
+
+# files
+  biome.json  [lint/biome]
+  package.json  [core/node-ts, lint/biome, atarashi]
+
+────────────────────────────────────────────────────────────────────────
+FILE biome.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": {
+    "includes": ["**", "!dist/**", "!coverage/**"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": { "quoteStyle": "single", "trailingCommas": "all", "semicolons": "always" }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": { "recommended": true }
+  },
+  "assist": { "actions": { "source": { "organizeImports": "off" } } }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.14",
+    "@types/node": "^22.19.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}

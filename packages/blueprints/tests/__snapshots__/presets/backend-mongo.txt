@@ -1,0 +1,1023 @@
+# blueprints
+  core/node-ts@1.0.0
+  validation/zod@1.0.0
+  db/mongodb@1.0.0
+  orm/mongoose@1.0.0
+  http/express@1.0.0
+  mw/cors@1.0.0
+  mw/helmet@1.0.0
+  mw/error-handler@1.0.0
+  obs/morgan-logger@1.0.0
+  auth/jwt@1.0.0
+  infra/docker@1.0.0
+  infra/docker-compose@1.0.0
+  lint/eslint-prettier@1.0.0
+  test/vitest@1.0.0
+  ci/github@1.0.0
+  meta/editorconfig@1.0.0
+  meta/license@1.0.0
+  meta/readme@1.0.0
+
+# dependencies
+  bcryptjs@^3.0.2  (auth/jwt)
+  cookie-parser@^1.4.7  (auth/jwt)
+  cors@^2.8.5  (mw/cors)
+  dotenv@^17.4.2  (validation/zod)
+  express@^4.21.2  (http/express)
+  helmet@^8.1.0  (mw/helmet)
+  jsonwebtoken@^9.0.2  (auth/jwt)
+  mongoose@^8.19.0  (orm/mongoose)
+  morgan@^1.10.1  (obs/morgan-logger)
+  zod@^3.25.76  (validation/zod)
+
+# devDependencies
+  @eslint/js@^9.37.0  (lint/eslint-prettier)
+  @types/bcryptjs@^3.0.0  (auth/jwt)
+  @types/cookie-parser@^1.4.9  (auth/jwt)
+  @types/cors@^2.8.19  (mw/cors)
+  @types/express@^4.17.23  (http/express)
+  @types/jsonwebtoken@^9.0.10  (auth/jwt)
+  @types/morgan@^1.9.10  (obs/morgan-logger)
+  @types/node@^22.19.0  (core/node-ts)
+  @types/supertest@^6.0.3  (test/vitest)
+  @vitest/coverage-v8@^3.2.4  (test/vitest)
+  eslint@^9.37.0  (lint/eslint-prettier)
+  eslint-config-prettier@^10.1.8  (lint/eslint-prettier)
+  prettier@^3.6.2  (lint/eslint-prettier)
+  supertest@^7.1.4  (test/vitest)
+  tsx@^4.20.6  (core/node-ts)
+  typescript@^5.9.3  (core/node-ts)
+  typescript-eslint@^8.45.0  (lint/eslint-prettier)
+  vitest@^3.2.4  (test/vitest)
+
+# next steps
+  Start the dev server:  pnpm run dev
+  Copy `.env.example` to `.env` and fill in the blanks
+  Start MongoDB:  pnpm run db:up
+  Set MONGODB_URI in .env
+  Add your models under `src/models/`
+  Check the API:  curl http://localhost:3000/health
+  Generate a signing key:  openssl rand -hex 32
+  Put it in .env as JWT_SECRET
+  Build the image:  docker build -t my-app .
+  Bring the stack up:  pnpm run compose:up
+  Lint the project:  pnpm run lint
+  Run the tests:  pnpm run test
+  Tests read the same environment as the app, so export your .env before running them
+  Push a branch and open a pull request to see CI run
+  Fill in the blank values in `.env.example` and copy it to `.env`
+
+# files
+  .dockerignore
+  .editorconfig
+  .env.example
+  .github/workflows/ci.yml
+  .gitignore
+  .prettierignore
+  .prettierrc.json
+  Dockerfile
+  LICENSE
+  README.md
+  atarashi.json
+  docker-compose.yml
+  eslint.config.mjs
+  package.json
+  pnpm-workspace.yaml
+  src/app.ts
+  src/config/env.ts
+  src/db/index.ts
+  src/index.ts
+  src/lib/async-handler.ts
+  src/lib/http-error.ts
+  src/lib/http.ts
+  src/lib/jwt.ts
+  src/lib/password.ts
+  src/middlewares/auth.ts
+  src/middlewares/error-handler.ts
+  src/models/user.ts
+  src/routes/index.ts
+  tests/health.test.ts
+  tsconfig.json
+  vitest.config.ts
+
+────────────────────────────────────────────────────────────────────────
+FILE .dockerignore  (644)
+────────────────────────────────────────────────────────────────────────
+node_modules
+dist
+coverage
+.git
+.gitignore
+.env
+.env.*.local
+Dockerfile
+.dockerignore
+docker-compose.yml
+*.log
+.DS_Store
+
+────────────────────────────────────────────────────────────────────────
+FILE .editorconfig  (644)
+────────────────────────────────────────────────────────────────────────
+# https://editorconfig.org
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab
+
+────────────────────────────────────────────────────────────────────────
+FILE .env.example  (644)
+────────────────────────────────────────────────────────────────────────
+# validation/zod
+# Runtime mode: development, test or production
+NODE_ENV=development
+
+# db/mongodb
+# MongoDB connection string, including the database name
+MONGODB_URI=mongodb://localhost:27017/my_app
+
+# http/express
+# Port the HTTP server listens on
+PORT=3000
+
+# mw/cors
+# Comma-separated list of allowed origins, or * for any
+CORS_ORIGIN=*
+
+# auth/jwt
+# Signing key for access tokens; at least 32 characters
+JWT_SECRET=
+# Access token lifetime, e.g. 30m, 12h, 7d
+JWT_EXPIRES_IN=7d
+
+────────────────────────────────────────────────────────────────────────
+FILE .github/workflows/ci.yml  (644)
+────────────────────────────────────────────────────────────────────────
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # gitleaks scans history, not just the tip.
+          fetch-depth: 0
+      # Doc 09 § T5: a committed `.env` is the leak this catches. The CLI in a
+      # container rather than the action, so it needs no token and no licence.
+      - name: Scan for committed secrets
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest detect --source /repo --redact --verbose
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      - run: pnpm install
+      - run: pnpm run lint
+      - run: pnpm run typecheck
+      - run: pnpm run build
+      - run: pnpm run test
+
+────────────────────────────────────────────────────────────────────────
+FILE .gitignore  (644)
+────────────────────────────────────────────────────────────────────────
+# core/node-ts
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.env*
+!.env.example
+*.log
+.DS_Store
+
+# lint/eslint-prettier
+.eslintcache
+
+────────────────────────────────────────────────────────────────────────
+FILE .prettierignore  (644)
+────────────────────────────────────────────────────────────────────────
+dist
+coverage
+node_modules
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+────────────────────────────────────────────────────────────────────────
+FILE .prettierrc.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "singleQuote": true,
+  "semi": true,
+  "printWidth": 100,
+  "tabWidth": 2,
+  "trailingComma": "all",
+  "endOfLine": "lf"
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE Dockerfile  (644)
+────────────────────────────────────────────────────────────────────────
+# syntax=docker/dockerfile:1
+
+FROM node:22-alpine AS build
+WORKDIR /app
+RUN corepack enable
+COPY package.json pnpm-lock.yaml* ./
+RUN pnpm install
+COPY . .
+RUN pnpm run build
+
+FROM node:22-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+RUN corepack enable
+COPY package.json pnpm-lock.yaml* ./
+RUN pnpm install
+COPY --from=build /app/dist ./dist
+
+EXPOSE 3000
+USER node
+CMD ["node", "dist/index.js"]
+
+────────────────────────────────────────────────────────────────────────
+FILE LICENSE  (644)
+────────────────────────────────────────────────────────────────────────
+MIT License
+
+Copyright (c) 2026 Ada Lovelace
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+────────────────────────────────────────────────────────────────────────
+FILE README.md  (644)
+────────────────────────────────────────────────────────────────────────
+# my-app
+
+A generated project
+
+## Getting started
+
+```sh
+pnpm install
+cp .env.example .env
+pnpm run dev
+```
+
+The server listens on `PORT` (3000 by default). Check it with:
+
+```sh
+curl http://localhost:3000/health
+```
+
+## Scripts
+
+| Script | What it does |
+| --- | --- |
+| `pnpm run dev` | Run the app with reload on change |
+| `pnpm run build` | Compile TypeScript to `dist/` |
+| `pnpm run start` | Run the compiled output |
+| `pnpm run typecheck` | Typecheck without emitting |
+| `pnpm run lint` | Lint the project |
+| `pnpm run format` | Format the project |
+| `pnpm run test` | Run the test suite |
+| `pnpm run db:push` | Apply the schema to the database |
+| `pnpm run db:studio` | Browse the data |
+| `pnpm run compose:up` | Build and start the whole stack |
+
+## Configuration
+
+Every variable the app needs is listed in `.env.example` and validated at boot
+by `src/config/env.ts`. The process exits immediately if one is missing
+or malformed, so a misconfigured deploy fails loudly instead of at the first
+request.
+
+## Blueprints
+
+This project was composed from:
+
+- `core/node-ts` @ 1.0.0
+- `validation/zod` @ 1.0.0
+- `db/mongodb` @ 1.0.0
+- `orm/mongoose` @ 1.0.0
+- `http/express` @ 1.0.0
+- `mw/cors` @ 1.0.0
+- `mw/helmet` @ 1.0.0
+- `mw/error-handler` @ 1.0.0
+- `obs/morgan-logger` @ 1.0.0
+- `auth/jwt` @ 1.0.0
+- `infra/docker` @ 1.0.0
+- `infra/docker-compose` @ 1.0.0
+- `lint/eslint-prettier` @ 1.0.0
+- `test/vitest` @ 1.0.0
+- `ci/github` @ 1.0.0
+- `meta/editorconfig` @ 1.0.0
+- `meta/license` @ 1.0.0
+- `meta/readme` @ 1.0.0
+
+`atarashi.json` records that selection. Add another capability with:
+
+```sh
+pnpm dlx atarashi add <blueprint>
+```
+
+────────────────────────────────────────────────────────────────────────
+FILE atarashi.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "$schema": "https://unpkg.com/@atarashi/schema/schemas/atarashi.schema.json",
+  "specVersion": 1,
+  "atarashiVersion": "1.0.0",
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "name": "my-app",
+  "blueprints": [
+    {
+      "id": "core/node-ts",
+      "version": "1.0.0"
+    },
+    {
+      "id": "validation/zod",
+      "version": "1.0.0"
+    },
+    {
+      "id": "db/mongodb",
+      "version": "1.0.0"
+    },
+    {
+      "id": "orm/mongoose",
+      "version": "1.0.0"
+    },
+    {
+      "id": "http/express",
+      "version": "1.0.0"
+    },
+    {
+      "id": "mw/cors",
+      "version": "1.0.0"
+    },
+    {
+      "id": "mw/helmet",
+      "version": "1.0.0"
+    },
+    {
+      "id": "mw/error-handler",
+      "version": "1.0.0"
+    },
+    {
+      "id": "obs/morgan-logger",
+      "version": "1.0.0"
+    },
+    {
+      "id": "auth/jwt",
+      "version": "1.0.0"
+    },
+    {
+      "id": "infra/docker",
+      "version": "1.0.0"
+    },
+    {
+      "id": "infra/docker-compose",
+      "version": "1.0.0"
+    },
+    {
+      "id": "lint/eslint-prettier",
+      "version": "1.0.0"
+    },
+    {
+      "id": "test/vitest",
+      "version": "1.0.0"
+    },
+    {
+      "id": "ci/github",
+      "version": "1.0.0"
+    },
+    {
+      "id": "meta/editorconfig",
+      "version": "1.0.0"
+    },
+    {
+      "id": "meta/license",
+      "version": "1.0.0"
+    },
+    {
+      "id": "meta/readme",
+      "version": "1.0.0"
+    }
+  ],
+  "answers": {
+    "auth.expiry": "7d",
+    "db.name": "my_app"
+  },
+  "options": {
+    "packageManager": "pnpm",
+    "git": true,
+    "install": true,
+    "format": true,
+    "initialCommit": true,
+    "license": "MIT",
+    "author": {
+      "name": "Ada Lovelace",
+      "email": "ada@example.com"
+    },
+    "writeEnv": false,
+    "force": false
+  },
+  "description": "A generated project",
+  "preset": "preset/backend-mongo"
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE docker-compose.yml  (644)
+────────────────────────────────────────────────────────────────────────
+services:
+  db:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodata:/data/db
+    healthcheck:
+      test:
+        - CMD
+        - mongosh
+        - --quiet
+        - --eval
+        - db.adminCommand('ping')
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  app:
+    build:
+      context: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - ${PORT:-3000}:3000
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  mongodata: {}
+
+────────────────────────────────────────────────────────────────────────
+FILE eslint.config.mjs  (644)
+────────────────────────────────────────────────────────────────────────
+import eslint from '@eslint/js';
+import prettier from 'eslint-config-prettier';
+import tseslint from 'typescript-eslint';
+
+export default tseslint.config(
+  { ignores: ['dist/**', 'coverage/**', 'node_modules/**'] },
+  eslint.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+    },
+  },
+  prettier,
+);
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A generated project",
+  "license": "MIT",
+  "author": "Ada Lovelace <ada@example.com>",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "compose:down": "docker compose down",
+    "compose:up": "docker compose up --build -d",
+    "db:up": "docker compose up -d db",
+    "dev": "tsx watch src/index.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.19.0",
+    "morgan": "^1.10.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.37.0",
+    "@types/bcryptjs": "^3.0.0",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.23",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^22.19.0",
+    "@types/supertest": "^6.0.3",
+    "@vitest/coverage-v8": "^3.2.4",
+    "eslint": "^9.37.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.6.2",
+    "supertest": "^7.1.4",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.45.0",
+    "vitest": "^3.2.4"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE pnpm-workspace.yaml  (644)
+────────────────────────────────────────────────────────────────────────
+allowBuilds:
+  esbuild: true
+onlyBuiltDependencies:
+  - esbuild
+
+────────────────────────────────────────────────────────────────────────
+FILE src/app.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import express from 'express';
+
+import { router } from './routes/index.js';
+// #region atarashi:imports
+import { env } from './config/env.js';
+import cors from 'cors';
+import helmet from 'helmet';
+import { errorHandler } from './middlewares/error-handler.js';
+import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
+
+// #endregion
+
+const app = express();
+
+app.disable('x-powered-by');
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true }));
+// #region atarashi:middleware
+app.use(
+  cors({
+    origin: env.CORS_ORIGIN === '*' ? true : env.CORS_ORIGIN.split(','),
+    credentials: true,
+  }),
+);
+app.use(helmet());
+app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use(cookieParser());
+// #endregion
+
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime() });
+});
+
+app.use('/api/v1', router);
+// #region atarashi:routes
+// #endregion
+
+app.use((_req, res) => {
+  res.status(404).json({ success: false, error: 'Not found' });
+});
+// #region atarashi:error-handlers
+app.use(errorHandler);
+// #endregion
+
+export { app };
+
+────────────────────────────────────────────────────────────────────────
+FILE src/config/env.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { config } from 'dotenv';
+import { z } from 'zod';
+
+// Loads `.env` when one is present, before anything reads `process.env`. A
+// missing file is not an error: in production the platform supplies the
+// environment, and `dotenv` leaves whatever is already set untouched.
+config({ quiet: true });
+
+/**
+ * The single source of truth for configuration. Every blueprint that needs an
+ * environment variable contributes its line to the region below, so the shape
+ * of `env` always matches `.env.example`.
+ */
+const schema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  // #region atarashi:env-schema
+  MONGODB_URI: z.string().min(1),
+  PORT: z.coerce.number().int().positive().default(3000),
+  CORS_ORIGIN: z.string().default('*'),
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
+  JWT_EXPIRES_IN: z.string().default('7d'),
+  // #endregion
+});
+
+const parsed = schema.safeParse(process.env);
+
+if (!parsed.success) {
+  console.error('Invalid environment variables:');
+  for (const issue of parsed.error.issues) {
+    console.error(`  - ${issue.path.join('.') || '(root)'}: ${issue.message}`);
+  }
+  process.exit(1);
+}
+
+export const env = parsed.data;
+export type Env = typeof env;
+
+────────────────────────────────────────────────────────────────────────
+FILE src/db/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import mongoose from 'mongoose';
+
+import { env } from '../config/env.js';
+
+export async function connectDatabase() {
+  mongoose.set('strictQuery', true);
+  await mongoose.connect(env.MONGODB_URI);
+}
+
+export async function disconnectDatabase() {
+  await mongoose.disconnect();
+}
+
+export { mongoose };
+
+────────────────────────────────────────────────────────────────────────
+FILE src/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+// #region atarashi:imports
+import { connectDatabase } from './db/index.js';
+import { app } from './app.js';
+import { env } from './config/env.js';
+
+// #endregion
+
+// #region atarashi:bootstrap
+await connectDatabase();
+app.listen(env.PORT, () => {
+  console.log(`my-app listening on http://localhost:${env.PORT}`);
+});
+// #endregion
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/async-handler.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
+
+/**
+ * Wraps an async route handler so a rejected promise reaches the error
+ * middleware instead of becoming an unhandled rejection.
+ */
+export const asyncHandler =
+  (handler: RequestHandler): RequestHandler =>
+  (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(handler(req, res, next)).catch(next);
+  };
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/http-error.ts  (644)
+────────────────────────────────────────────────────────────────────────
+/**
+ * The one error type route handlers should throw. Anything else reaching the
+ * handler is treated as a bug and reported as a 500 without leaking details.
+ */
+export class HttpError extends Error {
+  readonly status: number;
+  readonly details: unknown;
+
+  constructor(status: number, message: string, details?: unknown) {
+    super(message);
+    this.name = 'HttpError';
+    this.status = status;
+    this.details = details;
+  }
+
+  static badRequest(message = 'Bad request', details?: unknown) {
+    return new HttpError(400, message, details);
+  }
+
+  static unauthorized(message = 'Authentication required') {
+    return new HttpError(401, message);
+  }
+
+  static forbidden(message = 'Forbidden') {
+    return new HttpError(403, message);
+  }
+
+  static notFound(message = 'Not found') {
+    return new HttpError(404, message);
+  }
+
+  static conflict(message = 'Conflict') {
+    return new HttpError(409, message);
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/http.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import type { Response } from 'express';
+
+export const HttpStatus = Object.freeze({
+  OK: 200,
+  CREATED: 201,
+  NO_CONTENT: 204,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  CONFLICT: 409,
+  UNPROCESSABLE_ENTITY: 422,
+  TOO_MANY_REQUESTS: 429,
+  INTERNAL_SERVER_ERROR: 500,
+});
+
+export type HttpStatusCode = (typeof HttpStatus)[keyof typeof HttpStatus];
+
+export interface ApiSuccess<T> {
+  success: true;
+  data: T;
+}
+
+export interface ApiFailure {
+  success: false;
+  error: string;
+  details?: unknown;
+}
+
+export function sendSuccess<T>(res: Response, data: T, status: number = HttpStatus.OK) {
+  const body: ApiSuccess<T> = { success: true, data };
+  return res.status(status).json(body);
+}
+
+export function sendError(
+  res: Response,
+  error: string,
+  status: number = HttpStatus.INTERNAL_SERVER_ERROR,
+  details?: unknown,
+) {
+  const body: ApiFailure = { success: false, error, ...(details === undefined ? {} : { details }) };
+  return res.status(status).json(body);
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/jwt.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import jwt from 'jsonwebtoken';
+import type { SignOptions } from 'jsonwebtoken';
+
+import { env } from '../config/env.js';
+
+export interface TokenPayload {
+  /** The subject — normally the user id. */
+  sub: string;
+  [claim: string]: unknown;
+}
+
+export function signToken(payload: TokenPayload, options: SignOptions = {}): string {
+  return jwt.sign(payload, env.JWT_SECRET, {
+    expiresIn: env.JWT_EXPIRES_IN as SignOptions['expiresIn'],
+    ...options,
+  });
+}
+
+export function verifyToken(token: string): TokenPayload {
+  return jwt.verify(token, env.JWT_SECRET) as TokenPayload;
+}
+
+export function decodeToken(token: string): TokenPayload | null {
+  return jwt.decode(token) as TokenPayload | null;
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/password.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import bcrypt from 'bcryptjs';
+
+const ROUNDS = 12;
+
+export function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, ROUNDS);
+}
+
+export function verifyPassword(password: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(password, hash);
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/middlewares/auth.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import type { NextFunction, Request, Response } from 'express';
+
+import { HttpStatus, sendError } from '../lib/http.js';
+import { verifyToken } from '../lib/jwt.js';
+import type { TokenPayload } from '../lib/jwt.js';
+
+export interface AuthenticatedRequest extends Request {
+  user?: TokenPayload;
+}
+
+/** Accepts `Authorization: Bearer <token>` first, then a `token` cookie. */
+export function requireAuth(req: Request, res: Response, next: NextFunction) {
+  const header = req.headers.authorization;
+  const bearer = header?.startsWith('Bearer ') ? header.slice('Bearer '.length) : undefined;
+  const token = bearer ?? (req.cookies?.token as string | undefined);
+
+  if (!token) {
+    sendError(res, 'Authentication required', HttpStatus.UNAUTHORIZED);
+    return;
+  }
+
+  try {
+    (req as AuthenticatedRequest).user = verifyToken(token);
+    next();
+  } catch {
+    sendError(res, 'Invalid or expired token', HttpStatus.UNAUTHORIZED);
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/middlewares/error-handler.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import type { NextFunction, Request, Response } from 'express';
+import { ZodError } from 'zod';
+
+import { env } from '../config/env.js';
+import { HttpError } from '../lib/http-error.js';
+
+/**
+ * Express identifies an error handler by its four parameters, so `next` stays
+ * in the signature even though it is unused on the happy path.
+ */
+export function errorHandler(error: unknown, _req: Request, res: Response, next: NextFunction) {
+  if (res.headersSent) {
+    next(error);
+    return;
+  }
+
+  if (error instanceof ZodError) {
+    res.status(422).json({ success: false, error: 'Validation failed', details: error.issues });
+    return;
+  }
+
+  if (error instanceof HttpError) {
+    res.status(error.status).json({
+      success: false,
+      error: error.message,
+      ...(error.details === undefined ? {} : { details: error.details }),
+    });
+    return;
+  }
+
+  if (env.NODE_ENV !== 'production') {
+    console.error(error);
+  }
+
+  res.status(500).json({ success: false, error: 'Internal server error' });
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/models/user.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { model, Schema } from 'mongoose';
+
+export interface User {
+  email: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/** A starter model. Delete it once you have a real one. */
+const userSchema = new Schema<User>(
+  {
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+  },
+  { timestamps: true },
+);
+
+export const UserModel = model<User>('User', userSchema);
+
+────────────────────────────────────────────────────────────────────────
+FILE src/routes/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { Router } from 'express';
+
+/** Mounted at `/api/v1`. Add your feature routers here. */
+export const router = Router();
+
+router.get('/', (_req, res) => {
+  res.json({ success: true, data: { name: 'my-app', version: 1 } });
+});
+
+────────────────────────────────────────────────────────────────────────
+FILE tests/health.test.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import request from 'supertest';
+import { describe, expect, it } from 'vitest';
+
+import { app } from '../src/app.js';
+
+describe('GET /health', () => {
+  it('reports the service as healthy', async () => {
+    const response = await request(app).get('/health');
+
+    expect(response.status).toBe(200);
+    expect(response.body.status).toBe('ok');
+  });
+});
+
+────────────────────────────────────────────────────────────────────────
+FILE tsconfig.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "src",
+    "outDir": "dist",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "verbatimModuleSyntax": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE vitest.config.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    environment: 'node',
+    // A new project has no tests yet; that is not a failure.
+    passWithNoTests: true,
+    include: ['tests/**/*.test.ts'],
+    coverage: {
+      provider: 'v8',
+      include: ['src/**'],
+      reporter: ['text', 'lcov'],
+    },
+  },
+});

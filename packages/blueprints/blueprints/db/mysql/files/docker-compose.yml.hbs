@@ -1,0 +1,19 @@
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: {{#when "answers.db.name"}}{{expr "answers.db.name"}}{{else}}{{ project.slug }}{{/when}}
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysqldata:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-proot']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysqldata: {}

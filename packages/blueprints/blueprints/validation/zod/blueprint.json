@@ -1,0 +1,37 @@
+{
+    "manifestVersion": 1,
+    "id": "validation/zod",
+    "name": "Zod validation",
+    "version": "1.0.0",
+    "description": "Zod schemas plus a validated, typed environment loader that fails fast on bad config.",
+    "category": "validation",
+    "tags": ["zod", "validation", "config", "env"],
+    "provides": ["validation", "validation:zod", "config:env"],
+    "conflicts": ["validation"],
+    "requires": ["runtime:node"],
+    "after": ["core/node-ts", "core/node-js"],
+    "priority": 20,
+    "engines": {
+        "atarashi": ">=1.0.0-0 <2.0.0",
+        "node": ">=20.11"
+    },
+    "files": [
+        {
+            "from": "files/src/config/env.ts.hbs",
+            "to": "src/config/env.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}"
+        }
+    ],
+    "dependencies": {
+        "dotenv": "^17.4.2",
+        "zod": "^3.25.76"
+    },
+    "env": [
+        {
+            "key": "NODE_ENV",
+            "sample": "development",
+            "description": "Runtime mode: development, test or production",
+            "required": true
+        }
+    ],
+    "nextSteps": ["Copy `.env.example` to `.env` and fill in the blanks"]
+}

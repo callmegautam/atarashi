@@ -1,0 +1,22 @@
+{
+    "manifestVersion": 1,
+    "id": "meta/license",
+    "name": "License file",
+    "version": "1.0.0",
+    "description": "Writes the LICENSE text for the license chosen at generation time.",
+    "category": "meta",
+    "tags": ["license", "meta", "legal"],
+    "provides": ["meta:license"],
+    "priority": 95,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0" },
+    "files": [
+        { "from": "files/LICENSE.mit.hbs", "to": "LICENSE", "when": "options.license === 'MIT'" },
+        { "from": "files/LICENSE.isc.hbs", "to": "LICENSE", "when": "options.license === 'ISC'" },
+        {
+            "from": "files/LICENSE.bsd.hbs",
+            "to": "LICENSE",
+            "when": "options.license === 'BSD-3-Clause'"
+        }
+    ],
+    "nextSteps": []
+}

@@ -1,0 +1,80 @@
+{
+    "manifestVersion": 1,
+    "id": "http/express",
+    "name": "Express",
+    "version": "1.0.0",
+    "description": "Express HTTP server with a health check, a versioned router and JSON response helpers.",
+    "category": "http",
+    "tags": ["express", "http", "server", "rest"],
+    "provides": ["http", "http:express"],
+    "conflicts": ["http"],
+    "requires": ["runtime:node", "config:env"],
+    "after": ["core/node-ts", "core/node-js", "validation/zod"],
+    "priority": 50,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "files": [
+        {
+            "from": "files/src/app.ts.hbs",
+            "to": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}"
+        },
+        {
+            "from": "files/src/routes/index.ts.hbs",
+            "to": "src/routes/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}"
+        },
+        {
+            "from": "files/ts/lib/http.ts",
+            "to": "src/lib/http.ts",
+            "when": "provides('language:typescript')"
+        },
+        {
+            "from": "files/js/lib/http.js",
+            "to": "src/lib/http.js",
+            "when": "provides('language:javascript')"
+        },
+        {
+            "from": "files/ts/lib/async-handler.ts",
+            "to": "src/lib/async-handler.ts",
+            "when": "provides('language:typescript')"
+        },
+        {
+            "from": "files/js/lib/async-handler.js",
+            "to": "src/lib/async-handler.js",
+            "when": "provides('language:javascript')"
+        }
+    ],
+    "dependencies": { "express": "^4.21.2" },
+    "devDependencies": {
+        "@types/express": { "version": "^4.17.23", "when": "provides('language:typescript')" }
+    },
+    "env": [
+        {
+            "key": "PORT",
+            "sample": "3000",
+            "description": "Port the HTTP server listens on",
+            "required": false
+        }
+    ],
+    "contributions": [
+        {
+            "target": "src/config/env.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "env-schema",
+            "value": "PORT: z.coerce.number().int().positive().default(3000),"
+        },
+        {
+            "target": "src/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { app } from './app.js';"
+        },
+        {
+            "target": "src/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { env } from './config/env.js';"
+        },
+        {
+            "target": "src/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "bootstrap",
+            "value": "app.listen(env.PORT, () => {\n  console.log(`{{ project.name }} listening on http://localhost:${env.PORT}`);\n});"
+        }
+    ],
+    "nextSteps": ["Check the API:  curl http://localhost:3000/health"]
+}

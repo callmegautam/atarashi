@@ -1,0 +1,14 @@
+services:
+  app:
+    build:
+      context: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - '${PORT:-3000}:3000'
+{{#when "provides('database') && !has('db/sqlite')"}}
+    depends_on:
+      db:
+        condition: service_healthy
+{{/when}}

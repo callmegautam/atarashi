@@ -1,0 +1,79 @@
+{
+    "manifestVersion": 1,
+    "id": "core/node-ts",
+    "name": "Node.js + TypeScript",
+    "version": "1.0.0",
+    "description": "Node 20 ESM project with strict TypeScript, tsx for development and tsc for builds.",
+    "category": "core",
+    "tags": ["typescript", "node", "core"],
+    "provides": ["runtime:node", "language", "language:typescript"],
+    "conflicts": ["language"],
+    "priority": 10,
+    "engines": {
+        "atarashi": ">=1.0.0-0 <2.0.0",
+        "node": ">=20.11"
+    },
+    "files": [
+        {
+            "from": "files/tsconfig.json.hbs",
+            "to": "tsconfig.json",
+            "when": "!provides('ui') || provides('http')",
+            "merge": "json-deep"
+        },
+        {
+            "from": "files/src/index.ts.hbs",
+            "to": "src/index.ts",
+            "when": "!provides('ui') || provides('http')"
+        }
+    ],
+    "devDependencies": {
+        "typescript": "^5.9.3",
+        "tsx": {
+            "version": "^4.20.6",
+            "when": "!provides('ui') || provides('http')"
+        },
+        "@types/node": "^22.19.0"
+    },
+    "scripts": {
+        "dev": {
+            "value": "tsx watch src/index.ts",
+            "when": "!provides('ui') || provides('http')"
+        },
+        "build": {
+            "value": "tsc -p tsconfig.json",
+            "when": "!provides('ui') || provides('http')"
+        },
+        "start": {
+            "value": "node dist/index.js",
+            "when": "!provides('ui') || provides('http')"
+        },
+        "typecheck": {
+            "value": "tsc --noEmit -p tsconfig.json",
+            "when": "!provides('ui') || provides('http')"
+        }
+    },
+    "gitignore": [
+        "node_modules/",
+        "dist/",
+        "coverage/",
+        "*.tsbuildinfo",
+        ".env*",
+        "!.env.example",
+        "*.log",
+        ".DS_Store"
+    ],
+    "nextSteps": ["Start the dev server:  {{ pm.run }} dev"],
+    "contributions": [
+        {
+            "target": "pnpm-workspace.yaml",
+            "merge": "yaml-deep",
+            "value": {
+                "allowBuilds": {
+                    "esbuild": true
+                },
+                "onlyBuiltDependencies": ["esbuild"]
+            },
+            "when": "pm.name === 'pnpm'"
+        }
+    ]
+}

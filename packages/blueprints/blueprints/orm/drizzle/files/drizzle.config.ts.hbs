@@ -1,0 +1,21 @@
+import { defineConfig } from 'drizzle-kit';
+
+/**
+ * drizzle-kit loads this file with its own bundler, outside the app's module
+ * graph, so it reads the environment directly rather than importing `env`.
+ */
+const url = process.env.DATABASE_URL;
+
+if (!url) {
+  throw new Error('DATABASE_URL is not set; drizzle-kit cannot connect.');
+}
+
+export default defineConfig({
+  schema: './src/db/schema.ts',
+  out: './drizzle',
+  dialect: '{{#when "has('db/postgres')"}}postgresql{{/when}}{{#when "has('db/mysql')"}}mysql{{/when}}{{#when "has('db/sqlite')"}}sqlite{{/when}}',
+  dbCredentials: { url },
+  migrations: {
+    table: '__drizzle_migrations',
+  },
+});

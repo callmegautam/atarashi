@@ -1,0 +1,16 @@
+import { Hono } from 'hono';
+{{> slot "imports" }}
+
+export const app = new Hono();
+
+{{> slot "middleware" }}
+
+app.get('/health', (c) => c.json({ status: 'ok', uptime: process.uptime() }));
+
+app.get('/api/v1', (c) =>
+  c.json({ success: true, data: { name: '{{ project.name }}', version: 1 } }),
+);
+{{> slot "routes" }}
+
+app.notFound((c) => c.json({ success: false, error: 'Not found' }, 404));
+{{> slot "error-handlers" }}

@@ -1,0 +1,91 @@
+{
+    "manifestVersion": 1,
+    "id": "db/sqlite",
+    "name": "SQLite",
+    "version": "1.0.0",
+    "description": "File-backed SQLite database via better-sqlite3, with WAL enabled and no server to run.",
+    "category": "database",
+    "tags": ["sql", "sqlite", "database", "embedded"],
+    "provides": ["database", "database:sql", "database:sqlite"],
+    "conflicts": ["database"],
+    "requires": ["runtime:node", "config:env"],
+    "optionalPeers": ["orm/drizzle", "orm/prisma"],
+    "after": ["core/node-ts", "core/node-js", "validation/zod"],
+    "priority": 30,
+    "engines": {
+        "atarashi": ">=1.0.0-0 <2.0.0",
+        "node": ">=20.11"
+    },
+    "prompts": [
+        {
+            "name": "db.name",
+            "type": "input",
+            "message": "Database file name (without extension)",
+            "default": "{{ project.slug }}",
+            "flag": "--db-name",
+            "validate": {
+                "pattern": "^[a-z][a-z0-9_-]*$",
+                "message": "lowercase letters, digits, dashes and underscores"
+            }
+        }
+    ],
+    "files": [
+        {
+            "from": "files/src/db/client.ts.hbs",
+            "to": "src/db/client.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "when": "!has('orm/prisma')"
+        }
+    ],
+    "dependencies": {
+        "better-sqlite3": {
+            "version": "^13.0.3",
+            "when": "!has('orm/prisma')"
+        }
+    },
+    "devDependencies": {
+        "@types/better-sqlite3": {
+            "version": "^7.6.13",
+            "when": "provides('language:typescript') && !has('orm/prisma')"
+        }
+    },
+    "env": [
+        {
+            "key": "DATABASE_URL",
+            "sample": "file:./data/{{#when \"answers.db.name\"}}{{expr \"answers.db.name\"}}{{else}}{{ project.slug }}{{/when}}.db",
+            "description": "SQLite database file, as a `file:` URL",
+            "required": true
+        }
+    ],
+    "contributions": [
+        {
+            "target": "src/config/env.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "env-schema",
+            "value": "DATABASE_URL: z.string().min(1),"
+        },
+        {
+            "target": "src/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { checkDatabaseConnection } from './db/client.js';",
+            "when": "!has('orm/prisma')"
+        },
+        {
+            "target": "src/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "bootstrap",
+            "value": "checkDatabaseConnection();",
+            "when": "!has('orm/prisma')"
+        },
+        {
+            "target": "pnpm-workspace.yaml",
+            "merge": "yaml-deep",
+            "value": {
+                "allowBuilds": {
+                    "better-sqlite3": true
+                },
+                "onlyBuiltDependencies": ["better-sqlite3"]
+            },
+            "when": "pm.name === 'pnpm'"
+        }
+    ],
+    "gitignore": ["data/", "*.db", "*.db-shm", "*.db-wal"],
+    "nextSteps": ["The database file is created on first run under `data/`"]
+}

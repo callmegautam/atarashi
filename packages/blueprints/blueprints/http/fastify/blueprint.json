@@ -1,0 +1,53 @@
+{
+    "manifestVersion": 1,
+    "id": "http/fastify",
+    "name": "Fastify",
+    "version": "1.0.0",
+    "description": "Fastify HTTP server with structured logging, a health check and a versioned route prefix.",
+    "category": "http",
+    "tags": ["fastify", "http", "server", "rest"],
+    "provides": ["http", "http:fastify"],
+    "conflicts": ["http"],
+    "requires": ["runtime:node", "config:env"],
+    "after": ["core/node-ts", "core/node-js", "validation/zod"],
+    "priority": 50,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "files": [
+        {
+            "from": "files/src/app.ts.hbs",
+            "to": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}"
+        }
+    ],
+    "dependencies": { "fastify": "^5.6.1" },
+    "env": [
+        {
+            "key": "PORT",
+            "sample": "3000",
+            "description": "Port the HTTP server listens on",
+            "required": false
+        }
+    ],
+    "contributions": [
+        {
+            "target": "src/config/env.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "env-schema",
+            "value": "PORT: z.coerce.number().int().positive().default(3000),"
+        },
+        {
+            "target": "src/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { app } from './app.js';"
+        },
+        {
+            "target": "src/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { env } from './config/env.js';"
+        },
+        {
+            "target": "src/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "bootstrap",
+            "value": "await app.listen({ port: env.PORT, host: '0.0.0.0' });"
+        }
+    ],
+    "nextSteps": ["Check the API:  curl http://localhost:3000/health"]
+}

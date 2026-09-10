@@ -1,0 +1,64 @@
+# core/node-js
+
+# dependencies
+  dev @types/node@^22.19.0
+
+# files
+  .gitignore  [core/node-js]
+  jsconfig.json  [core/node-js]
+  package.json  [core/node-js, atarashi]
+  src/index.js  [core/node-js]
+
+────────────────────────────────────────────────────────────────────────
+FILE .gitignore  (644)
+────────────────────────────────────────────────────────────────────────
+node_modules/
+coverage/
+.env*
+!.env.example
+*.log
+.DS_Store
+
+────────────────────────────────────────────────────────────────────────
+FILE jsconfig.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "checkJs": true,
+    "strict": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*.js"],
+  "exclude": ["node_modules"]
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/index.js  (644)
+────────────────────────────────────────────────────────────────────────
+// #region atarashi:imports
+// #endregion
+
+// #region atarashi:bootstrap
+// #endregion
+console.log('my-app is running.');

@@ -1,0 +1,455 @@
+{
+  "budgetMs": 2000,
+  "runs": [
+    {
+      "at": "2026-09-09T02:41:48.654Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 986.368962,
+          "p95": 1246.897642,
+          "min": 788.617882
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 928.441122,
+          "p95": 1097.386841,
+          "min": 608.092498
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 528.739039,
+          "p95": 672.926833,
+          "min": 325.194273
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T02:48:18.557Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 632.429084,
+          "p95": 756.394099,
+          "min": 497.562511
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 658.761633,
+          "p95": 760.359295,
+          "min": 493.659496
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 383.562496,
+          "p95": 436.012076,
+          "min": 286.32267
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T02:52:26.543Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 846.622037,
+          "p95": 1173.45862,
+          "min": 666.390116
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 1112.098357,
+          "p95": 1189.497695,
+          "min": 638.868602
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 487.534336,
+          "p95": 641.930848,
+          "min": 251.388257
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T03:04:32.267Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 815.1948,
+          "p95": 1086.994013,
+          "min": 573.450537
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 932.995067,
+          "p95": 1106.100927,
+          "min": 796.847826
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 529.455024,
+          "p95": 735.184,
+          "min": 360.74235
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T15:35:24.013Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 627.162563,
+          "p95": 780.79976,
+          "min": 530.265201
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 632.803049,
+          "p95": 732.855247,
+          "min": 433.281909
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 490.100984,
+          "p95": 521.533907,
+          "min": 292.819881
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T15:39:02.016Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 666.212778,
+          "p95": 779.577265,
+          "min": 592.505072
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 707.651488,
+          "p95": 761.007634,
+          "min": 519.276643
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 486.704231,
+          "p95": 525.978401,
+          "min": 331.435337
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T15:58:23.072Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 634.150036,
+          "p95": 768.728068,
+          "min": 491.605067
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 632.242385,
+          "p95": 774.963375,
+          "min": 570.642436
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 492.444445,
+          "p95": 503.333006,
+          "min": 303.792232
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T16:02:26.815Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 675.320786,
+          "p95": 758.312738,
+          "min": 548.875391
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 662.478876,
+          "p95": 768.532374,
+          "min": 521.730906
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 488.644834,
+          "p95": 512.211519,
+          "min": 410.835262
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T16:42:42.763Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 910.15407,
+          "p95": 1218.446501,
+          "min": 696.013375
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 844.508987,
+          "p95": 1151.759582,
+          "min": 756.484384
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 614.04783,
+          "p95": 784.377178,
+          "min": 262.906378
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T16:47:43.915Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 640.924059,
+          "p95": 742.994831,
+          "min": 540.31806
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 647.525241,
+          "p95": 760.053346,
+          "min": 426.271323
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 493.154871,
+          "p95": 518.464624,
+          "min": 468.3166
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T16:50:51.763Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 671.004936,
+          "p95": 772.814048,
+          "min": 526.808701
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 663.069793,
+          "p95": 773.713674,
+          "min": 529.775072
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 486.092666,
+          "p95": 502.387031,
+          "min": 323.739565
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T16:54:51.355Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 676.98528,
+          "p95": 776.418676,
+          "min": 524.045276
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 633.823853,
+          "p95": 790.041309,
+          "min": 507.381407
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 498.577838,
+          "p95": 505.971073,
+          "min": 334.575223
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T17:34:13.041Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 913.692847,
+          "p95": 1247.3332,
+          "min": 743.126777
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 967.958332,
+          "p95": 1277.778891,
+          "min": 470.338829
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 585.054553,
+          "p95": 811.028105,
+          "min": 292.395774
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T17:39:15.751Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 911.544532,
+          "p95": 1219.982791,
+          "min": 609.242752
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 984.868121,
+          "p95": 1234.175111,
+          "min": 747.342575
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 524.154557,
+          "p95": 658.181638,
+          "min": 324.659339
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T17:53:19.227Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 974.588823,
+          "p95": 1073.537383,
+          "min": 737.087189
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 1146.90934,
+          "p95": 1231.934689,
+          "min": 810.98969
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 684.455462,
+          "p95": 829.534176,
+          "min": 536.197366
+        }
+      ]
+    },
+    {
+      "at": "2026-09-10T02:33:05.168Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 776.905413,
+          "p95": 948.698525,
+          "min": 585.962195
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 613.147501,
+          "p95": 980.650562,
+          "min": 550.748309
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 521.498159,
+          "p95": 591.883116,
+          "min": 242.790099
+        }
+      ]
+    },
+    {
+      "at": "2026-09-10T02:42:24.837Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 654.832126,
+          "p95": 722.095762,
+          "min": 520.897601
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 615.205777,
+          "p95": 666.713673,
+          "min": 516.136226
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 517.773053,
+          "p95": 555.835662,
+          "min": 431.765677
+        }
+      ]
+    },
+    {
+      "at": "2026-09-10T14:30:47.231Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 697.793951,
+          "p95": 850.896486,
+          "min": 509.243364
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 680.509028,
+          "p95": 716.64409,
+          "min": 520.868435
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 490.196913,
+          "p95": 519.43859,
+          "min": 276.145899
+        }
+      ]
+    }
+  ]
+}

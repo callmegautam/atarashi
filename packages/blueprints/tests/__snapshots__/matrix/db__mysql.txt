@@ -1,0 +1,69 @@
+# db/mysql
+
+# dependencies
+      mysql2@^3.15.2
+
+# files
+  .env.example  [validation/zod, db/mysql]
+  package.json  [core/node-ts, validation/zod, db/mysql, atarashi]
+  src/db/client.ts  [db/mysql]
+
+────────────────────────────────────────────────────────────────────────
+FILE .env.example  (644)
+────────────────────────────────────────────────────────────────────────
+# validation/zod
+# Runtime mode: development, test or production
+NODE_ENV=development
+
+# db/mysql
+# MySQL connection string
+DATABASE_URL=mysql://root:root@localhost:3306/my_app
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "mysql2": "^3.15.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/db/client.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { createPool } from 'mysql2/promise';
+
+import { env } from '../config/env.js';
+
+export const pool = createPool({
+  uri: env.DATABASE_URL,
+  connectionLimit: 10,
+});
+
+/** Fails fast at boot rather than on the first request. */
+export async function checkDatabaseConnection() {
+  const connection = await pool.getConnection();
+  try {
+    await connection.query('SELECT 1');
+  } finally {
+    connection.release();
+  }
+}

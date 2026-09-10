@@ -1,0 +1,59 @@
+{
+    "manifestVersion": 1,
+    "id": "obs/pino",
+    "name": "Pino structured logging",
+    "version": "1.0.0",
+    "description": "A shared Pino logger with pretty output in development and JSON lines in production.",
+    "category": "observability",
+    "tags": ["logging", "pino", "json", "observability"],
+    "provides": ["logging", "logging:pino"],
+    "conflicts": ["logging"],
+    "requires": ["runtime:node", "config:env"],
+    "after": ["http/express", "http/fastify", "http/hono"],
+    "priority": 65,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "files": [
+        {
+            "from": "files/src/lib/logger.ts.hbs",
+            "to": "src/lib/logger.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}"
+        }
+    ],
+    "dependencies": {
+        "pino": "^9.13.1",
+        "pino-http": { "version": "^10.5.0", "when": "has('http/express')" }
+    },
+    "devDependencies": { "pino-pretty": "^13.1.2" },
+    "env": [
+        {
+            "key": "LOG_LEVEL",
+            "sample": "info",
+            "description": "Pino log level: trace, debug, info, warn, error or fatal",
+            "required": false
+        }
+    ],
+    "contributions": [
+        {
+            "target": "src/config/env.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "env-schema",
+            "value": "LOG_LEVEL: z.enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal']).default('info'),"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { pinoHttp } from 'pino-http';",
+            "when": "has('http/express')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { logger } from './lib/logger.js';",
+            "when": "has('http/express')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "middleware",
+            "value": "app.use(pinoHttp({ logger }));",
+            "when": "has('http/express')"
+        }
+    ]
+}

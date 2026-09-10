@@ -1,0 +1,19 @@
+import Fastify from 'fastify';
+{{> slot "imports" }}
+
+export const app = Fastify({ logger: true });
+
+{{> slot "middleware" }}
+
+app.get('/health', async () => ({ status: 'ok', uptime: process.uptime() }));
+
+app.get('/api/v1', async () => ({
+  success: true,
+  data: { name: '{{ project.name }}', version: 1 },
+}));
+{{> slot "routes" }}
+
+app.setNotFoundHandler(async (_request, reply) => {
+  return reply.status(404).send({ success: false, error: 'Not found' });
+});
+{{> slot "error-handlers" }}

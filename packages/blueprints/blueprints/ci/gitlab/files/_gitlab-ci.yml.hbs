@@ -1,0 +1,39 @@
+image: node:22
+
+stages:
+  - scan
+  - verify
+
+cache:
+  key:
+    files:
+      - {{ pm.lockfile }}
+  paths:
+    - node_modules/
+
+# Doc 09 § T5: a committed `.env` is the leak this catches.
+secrets:
+  stage: scan
+  image:
+    name: zricethezav/gitleaks:latest
+    entrypoint: ['']
+  script:
+    - gitleaks detect --source . --redact --verbose
+
+verify:
+  stage: verify
+  before_script:
+    - corepack enable
+    - {{ pm.install }}
+  script:
+{{#when "provides('lint')"}}
+    - {{ pm.run }} lint
+{{/when}}
+{{#when "provides('language:typescript')"}}
+    - {{ pm.run }} typecheck
+    - {{ pm.run }} build
+{{/when}}
+{{#when "provides('test')"}}
+    - {{ pm.run }} test
+{{/when}}
+    - echo "verified"

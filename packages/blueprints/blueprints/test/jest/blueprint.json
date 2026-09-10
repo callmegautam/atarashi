@@ -1,0 +1,40 @@
+{
+    "manifestVersion": 1,
+    "id": "test/jest",
+    "name": "Jest",
+    "version": "1.0.0",
+    "description": "Jest in ESM mode, with ts-jest for TypeScript projects and a health-check test.",
+    "category": "test",
+    "tags": ["jest", "test", "coverage"],
+    "provides": ["test", "test:jest"],
+    "conflicts": ["test"],
+    "requires": ["runtime:node"],
+    "after": ["http/express", "http/fastify", "http/hono"],
+    "priority": 92,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "files": [
+        { "from": "files/jest.config.mjs.hbs", "to": "jest.config.mjs" },
+        {
+            "from": "files/tests/health.test.ts.hbs",
+            "to": "tests/health.{{#when \"provides('language:typescript')\"}}test.ts{{else}}test.js{{/when}}"
+        }
+    ],
+    "devDependencies": {
+        "jest": "^30.2.0",
+        "ts-jest": { "version": "^29.4.5", "when": "provides('language:typescript')" },
+        "supertest": { "version": "^7.1.4", "when": "has('http/express')" },
+        "@types/supertest": {
+            "version": "^6.0.3",
+            "when": "provides('language:typescript') && has('http/express')"
+        }
+    },
+    "scripts": {
+        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+        "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage"
+    },
+    "gitignore": ["coverage/"],
+    "nextSteps": [
+        "Run the tests:  {{ pm.run }} test",
+        "Tests read the same environment as the app, so export your .env before running them"
+    ]
+}

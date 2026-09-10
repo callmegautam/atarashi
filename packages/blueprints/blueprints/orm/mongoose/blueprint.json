@@ -1,0 +1,45 @@
+{
+    "manifestVersion": 1,
+    "id": "orm/mongoose",
+    "name": "Mongoose",
+    "version": "1.0.0",
+    "description": "Mongoose connection lifecycle and a starter model for a MongoDB project.",
+    "category": "orm",
+    "tags": ["mongoose", "odm", "mongodb"],
+    "provides": ["orm", "orm:mongoose"],
+    "conflicts": ["orm"],
+    "requires": ["database:mongodb"],
+    "after": ["db/mongodb"],
+    "priority": 40,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "files": [
+        {
+            "from": "files/src/db/index.ts.hbs",
+            "to": "src/db/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}"
+        },
+        {
+            "from": "files/ts/models/user.ts",
+            "to": "src/models/user.ts",
+            "when": "provides('language:typescript')"
+        },
+        {
+            "from": "files/js/models/user.js",
+            "to": "src/models/user.js",
+            "when": "provides('language:javascript')"
+        }
+    ],
+    "dependencies": { "mongoose": "^8.19.0" },
+    "contributions": [
+        {
+            "target": "src/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { connectDatabase } from './db/index.js';"
+        },
+        {
+            "target": "src/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "bootstrap",
+            "value": "await connectDatabase();"
+        }
+    ],
+    "nextSteps": ["Add your models under `src/models/`"]
+}

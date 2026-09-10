@@ -1,0 +1,314 @@
+# blueprints
+  core/node-ts@1.0.0
+  validation/zod@1.0.0
+  db/mysql@1.0.0
+  orm/prisma@1.0.0
+  http/hono@1.0.0
+
+# dependencies
+  @hono/node-server@^1.19.5  (http/hono)
+  @prisma/client@^6.16.2  (orm/prisma)
+  dotenv@^17.4.2  (validation/zod)
+  hono@^4.9.10  (http/hono)
+  zod@^3.25.76  (validation/zod)
+
+# devDependencies
+  @types/node@^22.19.0  (core/node-ts)
+  prisma@^6.16.2  (orm/prisma)
+  tsx@^4.20.6  (core/node-ts)
+  typescript@^5.9.3  (core/node-ts)
+
+# next steps
+  Start the dev server:  pnpm run dev
+  Copy `.env.example` to `.env` and fill in the blanks
+  Start MySQL:  pnpm run db:up
+  Set DATABASE_URL in .env
+  Generate the client:  pnpm run db:generate
+  Create the tables:    pnpm run db:push
+  Check the API:  curl http://localhost:3000/health
+
+# files
+  .env.example
+  .gitignore
+  atarashi.json
+  package.json
+  pnpm-workspace.yaml
+  prisma/schema.prisma
+  src/app.ts
+  src/config/env.ts
+  src/db/index.ts
+  src/index.ts
+  tsconfig.json
+
+────────────────────────────────────────────────────────────────────────
+FILE .env.example  (644)
+────────────────────────────────────────────────────────────────────────
+# validation/zod
+# Runtime mode: development, test or production
+NODE_ENV=development
+
+# db/mysql
+# MySQL connection string
+DATABASE_URL=mysql://root:root@localhost:3306/my_app
+
+# http/hono
+# Port the HTTP server listens on
+PORT=3000
+
+────────────────────────────────────────────────────────────────────────
+FILE .gitignore  (644)
+────────────────────────────────────────────────────────────────────────
+# core/node-ts
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.env*
+!.env.example
+*.log
+.DS_Store
+
+# orm/prisma
+prisma/*.db
+prisma/migrations/dev.db*
+
+────────────────────────────────────────────────────────────────────────
+FILE atarashi.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "$schema": "https://unpkg.com/@atarashi/schema/schemas/atarashi.schema.json",
+  "specVersion": 1,
+  "atarashiVersion": "1.0.0",
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "name": "my-app",
+  "blueprints": [
+    {
+      "id": "core/node-ts",
+      "version": "1.0.0"
+    },
+    {
+      "id": "validation/zod",
+      "version": "1.0.0"
+    },
+    {
+      "id": "db/mysql",
+      "version": "1.0.0"
+    },
+    {
+      "id": "orm/prisma",
+      "version": "1.0.0"
+    },
+    {
+      "id": "http/hono",
+      "version": "1.0.0"
+    }
+  ],
+  "answers": {
+    "auth.expiry": "7d",
+    "db.name": "my_app",
+    "db.pool": true
+  },
+  "options": {
+    "packageManager": "pnpm",
+    "git": true,
+    "install": true,
+    "format": true,
+    "initialCommit": true,
+    "license": "MIT",
+    "author": {
+      "name": "Ada Lovelace",
+      "email": "ada@example.com"
+    },
+    "writeEnv": false,
+    "force": false
+  },
+  "description": "A generated project"
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A generated project",
+  "license": "MIT",
+  "author": "Ada Lovelace <ada@example.com>",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "dev": "tsx watch src/index.ts",
+    "postinstall": "prisma generate",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.5",
+    "@prisma/client": "^6.16.2",
+    "dotenv": "^17.4.2",
+    "hono": "^4.9.10",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "prisma": "^6.16.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE pnpm-workspace.yaml  (644)
+────────────────────────────────────────────────────────────────────────
+allowBuilds:
+  esbuild: true
+  "@prisma/client": true
+  "@prisma/engines": true
+  prisma: true
+onlyBuiltDependencies:
+  - esbuild
+  - "@prisma/client"
+  - "@prisma/engines"
+  - prisma
+
+────────────────────────────────────────────────────────────────────────
+FILE prisma/schema.prisma  (644)
+────────────────────────────────────────────────────────────────────────
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// A starter model. Delete it once you have a real one.
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/app.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { Hono } from 'hono';
+// #region atarashi:imports
+// #endregion
+
+export const app = new Hono();
+
+// #region atarashi:middleware
+// #endregion
+
+app.get('/health', (c) => c.json({ status: 'ok', uptime: process.uptime() }));
+
+app.get('/api/v1', (c) =>
+  c.json({ success: true, data: { name: 'my-app', version: 1 } }),
+);
+// #region atarashi:routes
+// #endregion
+
+app.notFound((c) => c.json({ success: false, error: 'Not found' }, 404));
+// #region atarashi:error-handlers
+// #endregion
+
+────────────────────────────────────────────────────────────────────────
+FILE src/config/env.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { config } from 'dotenv';
+import { z } from 'zod';
+
+// Loads `.env` when one is present, before anything reads `process.env`. A
+// missing file is not an error: in production the platform supplies the
+// environment, and `dotenv` leaves whatever is already set untouched.
+config({ quiet: true });
+
+/**
+ * The single source of truth for configuration. Every blueprint that needs an
+ * environment variable contributes its line to the region below, so the shape
+ * of `env` always matches `.env.example`.
+ */
+const schema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  // #region atarashi:env-schema
+  DATABASE_URL: z.string().min(1),
+  PORT: z.coerce.number().int().positive().default(3000),
+  // #endregion
+});
+
+const parsed = schema.safeParse(process.env);
+
+if (!parsed.success) {
+  console.error('Invalid environment variables:');
+  for (const issue of parsed.error.issues) {
+    console.error(`  - ${issue.path.join('.') || '(root)'}: ${issue.message}`);
+  }
+  process.exit(1);
+}
+
+export const env = parsed.data;
+export type Env = typeof env;
+
+────────────────────────────────────────────────────────────────────────
+FILE src/db/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { PrismaClient } from '@prisma/client';
+
+export const prisma = new PrismaClient();
+
+/** Fails fast at boot rather than on the first query. */
+export async function checkDatabaseConnection() {
+  await prisma.$queryRaw`SELECT 1`;
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+// #region atarashi:imports
+import { checkDatabaseConnection } from './db/index.js';
+import { serve } from '@hono/node-server';
+import { app } from './app.js';
+import { env } from './config/env.js';
+
+// #endregion
+
+// #region atarashi:bootstrap
+await checkDatabaseConnection();
+serve({ fetch: app.fetch, port: env.PORT }, (info) => {
+  console.log(`my-app listening on http://localhost:${info.port}`);
+});
+// #endregion
+
+────────────────────────────────────────────────────────────────────────
+FILE tsconfig.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "src",
+    "outDir": "dist",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "verbatimModuleSyntax": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,0 +1,107 @@
+# orm/drizzle
+
+# dependencies
+  dev drizzle-kit@^0.31.5
+      drizzle-orm@^0.44.6
+
+# files
+  drizzle.config.ts  [orm/drizzle]
+  package.json  [core/node-ts, validation/zod, db/postgres, orm/drizzle, atarashi]
+  pnpm-workspace.yaml  [core/node-ts, orm/drizzle]
+  src/db/index.ts  [orm/drizzle]
+  src/db/schema.ts  [orm/drizzle]
+
+────────────────────────────────────────────────────────────────────────
+FILE drizzle.config.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { defineConfig } from 'drizzle-kit';
+
+/**
+ * drizzle-kit loads this file with its own bundler, outside the app's module
+ * graph, so it reads the environment directly rather than importing `env`.
+ */
+const url = process.env.DATABASE_URL;
+
+if (!url) {
+  throw new Error('DATABASE_URL is not set; drizzle-kit cannot connect.');
+}
+
+export default defineConfig({
+  schema: './src/db/schema.ts',
+  out: './drizzle',
+  dialect: 'postgresql',
+  dbCredentials: { url },
+  migrations: {
+    table: '__drizzle_migrations',
+  },
+});
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "^0.44.6",
+    "pg": "^8.16.3",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "@types/pg": "^8.15.5",
+    "drizzle-kit": "^0.31.5",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE pnpm-workspace.yaml  (644)
+────────────────────────────────────────────────────────────────────────
+allowBuilds:
+  esbuild: true
+onlyBuiltDependencies:
+  - esbuild
+
+────────────────────────────────────────────────────────────────────────
+FILE src/db/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { drizzle } from 'drizzle-orm/node-postgres';
+
+import { pool } from './client.js';
+import * as schema from './schema.js';
+
+export const db = drizzle(pool, { schema });
+
+export type Database = typeof db;
+
+────────────────────────────────────────────────────────────────────────
+FILE src/db/schema.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+
+/** A starter table. Delete it once you have a real one. */
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  email: text('email').notNull().unique(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }),
+});
+
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;

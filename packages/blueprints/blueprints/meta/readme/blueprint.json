@@ -1,0 +1,13 @@
+{
+    "manifestVersion": 1,
+    "id": "meta/readme",
+    "name": "README",
+    "version": "1.0.0",
+    "description": "A README describing exactly this project: its scripts, its environment variables and its blueprints.",
+    "category": "meta",
+    "tags": ["readme", "docs", "meta"],
+    "provides": ["meta:readme"],
+    "priority": 96,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0" },
+    "files": [{ "from": "files/README.md.hbs", "to": "README.md" }]
+}

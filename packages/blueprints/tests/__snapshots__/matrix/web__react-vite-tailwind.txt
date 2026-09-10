@@ -1,0 +1,197 @@
+# web/react-vite-tailwind
+
+# dependencies
+
+# files
+  .gitignore  [core/node-ts, web/react-vite-tailwind]
+  index.html  [web/react-vite-tailwind]
+  package.json  [core/node-ts, web/react-vite-tailwind, atarashi]
+  pnpm-workspace.yaml  [core/node-ts, web/react-vite-tailwind]
+  src/App.tsx  [web/react-vite-tailwind]
+  src/index.css  [web/react-vite-tailwind]
+  src/main.tsx  [web/react-vite-tailwind]
+  src/vite-env.d.ts  [web/react-vite-tailwind]
+  tsconfig.app.json  [web/react-vite-tailwind]
+  tsconfig.json  [web/react-vite-tailwind]
+  tsconfig.node.json  [web/react-vite-tailwind]
+  vite.config.ts  [web/react-vite-tailwind]
+
+────────────────────────────────────────────────────────────────────────
+FILE .gitignore  (644)
+────────────────────────────────────────────────────────────────────────
+# core/node-ts
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.env*
+!.env.example
+*.log
+.DS_Store
+
+# web/react-vite-tailwind
+.vite/
+
+────────────────────────────────────────────────────────────────────────
+FILE index.html  (644)
+────────────────────────────────────────────────────────────────────────
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>my-app</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b && vite build",
+    "dev": "vite",
+    "preview": "vite preview",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.12",
+    "@types/node": "^22.19.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.0.4",
+    "tailwindcss": "^4.1.12",
+    "typescript": "~5.9.3",
+    "vite": "^7.1.9",
+    "vitest": "^3.2.4"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE pnpm-workspace.yaml  (644)
+────────────────────────────────────────────────────────────────────────
+allowBuilds:
+  esbuild: true
+onlyBuiltDependencies:
+  - esbuild
+
+────────────────────────────────────────────────────────────────────────
+FILE src/App.tsx  (644)
+────────────────────────────────────────────────────────────────────────
+export default function App() {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-slate-950 px-6 text-slate-100">
+      <section className="max-w-xl space-y-4 text-center">
+        <h1 className="text-4xl font-semibold tracking-tight">my-app</h1>
+        <p className="text-slate-400">
+          React, Vite and Tailwind are wired up. Edit{' '}
+          <code className="rounded bg-slate-800 px-1.5 py-0.5 text-sm">src/App.tsx</code> to begin.
+        </p>
+      </section>
+    </main>
+  );
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/index.css  (644)
+────────────────────────────────────────────────────────────────────────
+@import 'tailwindcss';
+
+────────────────────────────────────────────────────────────────────────
+FILE src/main.tsx  (644)
+────────────────────────────────────────────────────────────────────────
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+
+import App from './App';
+import './index.css';
+
+const container = document.getElementById('root');
+
+if (!container) {
+  throw new Error('No #root element in index.html');
+}
+
+createRoot(container).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
+
+────────────────────────────────────────────────────────────────────────
+FILE src/vite-env.d.ts  (644)
+────────────────────────────────────────────────────────────────────────
+/// <reference types="vite/client" />
+
+────────────────────────────────────────────────────────────────────────
+FILE tsconfig.app.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE tsconfig.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE tsconfig.node.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "include": ["vite.config.ts"]
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE vite.config.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  server: { port: 5173 },
+});

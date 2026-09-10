@@ -1,0 +1,80 @@
+{
+    "manifestVersion": 1,
+    "id": "mw/cors",
+    "name": "CORS",
+    "version": "1.0.0",
+    "description": "Cross-origin request handling driven by a CORS_ORIGIN allow-list, for Express, Fastify or Hono.",
+    "category": "middleware",
+    "tags": ["cors", "middleware", "security"],
+    "provides": ["middleware:cors"],
+    "requires": ["http", "config:env"],
+    "after": ["http/express", "http/fastify", "http/hono"],
+    "priority": 60,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "dependencies": {
+        "cors": { "version": "^2.8.5", "when": "has('http/express')" },
+        "@fastify/cors": { "version": "^11.1.0", "when": "has('http/fastify')" }
+    },
+    "devDependencies": {
+        "@types/cors": {
+            "version": "^2.8.19",
+            "when": "provides('language:typescript') && has('http/express')"
+        }
+    },
+    "env": [
+        {
+            "key": "CORS_ORIGIN",
+            "sample": "*",
+            "description": "Comma-separated list of allowed origins, or * for any",
+            "required": false
+        }
+    ],
+    "contributions": [
+        {
+            "target": "src/config/env.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "env-schema",
+            "value": "CORS_ORIGIN: z.string().default('*'),"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { env } from './config/env.js';"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import cors from 'cors';",
+            "when": "has('http/express')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "middleware",
+            "value": "app.use(\n  cors({\n    origin: env.CORS_ORIGIN === '*' ? true : env.CORS_ORIGIN.split(','),\n    credentials: true,\n  }),\n);",
+            "when": "has('http/express')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import fastifyCors from '@fastify/cors';",
+            "when": "has('http/fastify')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "middleware",
+            "value": "await app.register(fastifyCors, {\n  origin: env.CORS_ORIGIN === '*' ? true : env.CORS_ORIGIN.split(','),\n  credentials: true,\n});",
+            "when": "has('http/fastify')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { cors } from 'hono/cors';",
+            "when": "has('http/hono')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "middleware",
+            "value": "app.use(\n  '*',\n  cors({\n    origin: env.CORS_ORIGIN === '*' ? '*' : env.CORS_ORIGIN.split(','),\n    credentials: true,\n  }),\n);",
+            "when": "has('http/hono')"
+        }
+    ]
+}

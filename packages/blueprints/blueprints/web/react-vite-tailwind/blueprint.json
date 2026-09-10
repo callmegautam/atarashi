@@ -1,0 +1,89 @@
+{
+    "manifestVersion": 1,
+    "id": "web/react-vite-tailwind",
+    "name": "React + Vite + Tailwind",
+    "version": "1.0.0",
+    "description": "React 19 on Vite with the Tailwind v4 plugin, strict TypeScript and Vitest.",
+    "category": "frontend",
+    "tags": ["react", "vite", "tailwind", "frontend", "spa"],
+    "provides": ["ui", "ui:react"],
+    "conflicts": ["ui"],
+    "requires": ["language:typescript"],
+    "after": ["core/node-ts"],
+    "priority": 55,
+    "engines": {
+        "atarashi": ">=1.0.0-0 <2.0.0",
+        "node": ">=20.19"
+    },
+    "files": [
+        {
+            "from": "files/package.json.hbs",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}package.json",
+            "merge": "json-deep"
+        },
+        {
+            "from": "files/vite.config.ts",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}vite.config.ts"
+        },
+        {
+            "from": "files/tsconfig.json",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}tsconfig.json"
+        },
+        {
+            "from": "files/tsconfig.app.json",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}tsconfig.app.json"
+        },
+        {
+            "from": "files/tsconfig.node.json",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}tsconfig.node.json"
+        },
+        {
+            "from": "files/index.html.hbs",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}index.html",
+            "escape": true
+        },
+        {
+            "from": "files/src/main.tsx",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}src/main.tsx"
+        },
+        {
+            "from": "files/src/App.tsx.hbs",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}src/App.tsx"
+        },
+        {
+            "from": "files/src/index.css",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}src/index.css"
+        },
+        {
+            "from": "files/src/vite-env.d.ts",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}src/vite-env.d.ts"
+        }
+    ],
+    "scripts": {
+        "dev:web": {
+            "value": "cd web && {{ pm.run }} dev",
+            "when": "provides('http')"
+        },
+        "build:web": {
+            "value": "cd web && {{ pm.run }} build",
+            "when": "provides('http')"
+        }
+    },
+    "gitignore": ["dist/", ".vite/"],
+    "nextSteps": [
+        "Start the Vite dev server:  {{#when \"provides('http')\"}}{{ pm.run }} dev:web{{else}}{{ pm.run }} dev{{/when}}"
+    ],
+    "contributions": [
+        {
+            "target": "pnpm-workspace.yaml",
+            "merge": "yaml-deep",
+            "value": {
+                "allowBuilds": {
+                    "esbuild": true
+                },
+                "onlyBuiltDependencies": ["esbuild"]
+            },
+            "when": "pm.name === 'pnpm'"
+        }
+    ]
+}

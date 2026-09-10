@@ -1,0 +1,126 @@
+{
+    "manifestVersion": 1,
+    "id": "auth/jwt",
+    "name": "JWT authentication",
+    "version": "1.0.0",
+    "description": "Stateless JWT auth: signing helpers, bcrypt password hashing and a bearer/cookie guard.",
+    "category": "auth",
+    "tags": ["auth", "jwt", "bcrypt", "security"],
+    "provides": ["auth", "auth:jwt"],
+    "conflicts": ["auth"],
+    "requires": ["http", "config:env"],
+    "after": ["http/express", "http/fastify", "http/hono"],
+    "priority": 70,
+    "engines": {
+        "atarashi": ">=1.0.0-0 <2.0.0",
+        "node": ">=20.11"
+    },
+    "prompts": [
+        {
+            "name": "auth.expiry",
+            "type": "input",
+            "message": "How long should an access token stay valid?",
+            "default": "7d",
+            "flag": "--auth-expiry",
+            "validate": {
+                "pattern": "^[0-9]+[smhd]$",
+                "message": "e.g. 30m, 12h, 7d"
+            }
+        }
+    ],
+    "files": [
+        {
+            "from": "files/ts/lib/jwt.ts",
+            "to": "src/lib/jwt.ts",
+            "when": "provides('language:typescript')"
+        },
+        {
+            "from": "files/js/lib/jwt.js",
+            "to": "src/lib/jwt.js",
+            "when": "provides('language:javascript')"
+        },
+        {
+            "from": "files/ts/lib/password.ts",
+            "to": "src/lib/password.ts",
+            "when": "provides('language:typescript')"
+        },
+        {
+            "from": "files/js/lib/password.js",
+            "to": "src/lib/password.js",
+            "when": "provides('language:javascript')"
+        },
+        {
+            "from": "files/ts/middlewares/auth.ts",
+            "to": "src/middlewares/auth.ts",
+            "when": "provides('language:typescript') && has('http/express')"
+        },
+        {
+            "from": "files/js/middlewares/auth.js",
+            "to": "src/middlewares/auth.js",
+            "when": "provides('language:javascript') && has('http/express')"
+        }
+    ],
+    "dependencies": {
+        "jsonwebtoken": "^9.0.2",
+        "bcryptjs": "^3.0.2",
+        "cookie-parser": {
+            "version": "^1.4.7",
+            "when": "has('http/express')"
+        }
+    },
+    "devDependencies": {
+        "@types/jsonwebtoken": {
+            "version": "^9.0.10",
+            "when": "provides('language:typescript')"
+        },
+        "@types/bcryptjs": {
+            "version": "^3.0.0",
+            "when": "provides('language:typescript')"
+        },
+        "@types/cookie-parser": {
+            "version": "^1.4.9",
+            "when": "provides('language:typescript') && has('http/express')"
+        }
+    },
+    "env": [
+        {
+            "key": "JWT_SECRET",
+            "sample": "generate with: openssl rand -hex 32",
+            "description": "Signing key for access tokens; at least 32 characters",
+            "required": true,
+            "secret": true,
+            "generate": "hex-32"
+        },
+        {
+            "key": "JWT_EXPIRES_IN",
+            "sample": "{{#when \"answers.auth.expiry\"}}{{expr \"answers.auth.expiry\"}}{{else}}7d{{/when}}",
+            "description": "Access token lifetime, e.g. 30m, 12h, 7d",
+            "required": false
+        }
+    ],
+    "contributions": [
+        {
+            "target": "src/config/env.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "env-schema",
+            "value": "JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),"
+        },
+        {
+            "target": "src/config/env.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "env-schema",
+            "value": "JWT_EXPIRES_IN: z.string().default('{{#when \"answers.auth.expiry\"}}{{expr \"answers.auth.expiry\"}}{{else}}7d{{/when}}'),"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import cookieParser from 'cookie-parser';",
+            "when": "has('http/express')"
+        },
+        {
+            "target": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "middleware",
+            "value": "app.use(cookieParser());",
+            "when": "has('http/express')"
+        }
+    ],
+    "nextSteps": ["Generate a signing key:  openssl rand -hex 32", "Put it in .env as JWT_SECRET"]
+}

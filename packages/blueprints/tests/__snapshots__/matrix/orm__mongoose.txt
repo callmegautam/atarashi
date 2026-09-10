@@ -1,0 +1,75 @@
+# orm/mongoose
+
+# dependencies
+      mongoose@^8.19.0
+
+# files
+  package.json  [core/node-ts, validation/zod, orm/mongoose, atarashi]
+  src/db/index.ts  [orm/mongoose]
+  src/models/user.ts  [orm/mongoose]
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "mongoose": "^8.19.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/db/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import mongoose from 'mongoose';
+
+import { env } from '../config/env.js';
+
+export async function connectDatabase() {
+  mongoose.set('strictQuery', true);
+  await mongoose.connect(env.MONGODB_URI);
+}
+
+export async function disconnectDatabase() {
+  await mongoose.disconnect();
+}
+
+export { mongoose };
+
+────────────────────────────────────────────────────────────────────────
+FILE src/models/user.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { model, Schema } from 'mongoose';
+
+export interface User {
+  email: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/** A starter model. Delete it once you have a real one. */
+const userSchema = new Schema<User>(
+  {
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+  },
+  { timestamps: true },
+);
+
+export const UserModel = model<User>('User', userSchema);

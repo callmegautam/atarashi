@@ -1,0 +1,71 @@
+{
+    "manifestVersion": 1,
+    "id": "orm/prisma",
+    "name": "Prisma ORM",
+    "version": "1.0.0",
+    "description": "Prisma schema and client wired to the selected SQL database, with migrate and studio scripts.",
+    "category": "orm",
+    "tags": ["prisma", "orm", "sql", "typescript"],
+    "provides": ["orm", "orm:prisma"],
+    "conflicts": ["orm"],
+    "requires": ["database:sql", "language:typescript"],
+    "after": ["db/postgres", "db/mysql", "db/sqlite"],
+    "priority": 40,
+    "engines": {
+        "atarashi": ">=1.0.0-0 <2.0.0",
+        "node": ">=20.11"
+    },
+    "files": [
+        {
+            "from": "files/prisma/schema.prisma.hbs",
+            "to": "prisma/schema.prisma"
+        },
+        {
+            "from": "files/src/db/index.ts.hbs",
+            "to": "src/db/index.ts"
+        }
+    ],
+    "dependencies": {
+        "@prisma/client": "^6.16.2"
+    },
+    "devDependencies": {
+        "prisma": "^6.16.2"
+    },
+    "scripts": {
+        "db:generate": "prisma generate",
+        "db:push": "prisma db push",
+        "db:migrate": "prisma migrate dev",
+        "db:studio": "prisma studio",
+        "postinstall": "prisma generate"
+    },
+    "contributions": [
+        {
+            "target": "src/index.ts",
+            "slot": "imports",
+            "value": "import { checkDatabaseConnection } from './db/index.js';"
+        },
+        {
+            "target": "src/index.ts",
+            "slot": "bootstrap",
+            "value": "await checkDatabaseConnection();"
+        },
+        {
+            "target": "pnpm-workspace.yaml",
+            "merge": "yaml-deep",
+            "value": {
+                "allowBuilds": {
+                    "@prisma/client": true,
+                    "@prisma/engines": true,
+                    "prisma": true
+                },
+                "onlyBuiltDependencies": ["@prisma/client", "@prisma/engines", "prisma"]
+            },
+            "when": "pm.name === 'pnpm'"
+        }
+    ],
+    "gitignore": ["prisma/*.db", "prisma/migrations/dev.db*"],
+    "nextSteps": [
+        "Generate the client:  {{ pm.run }} db:generate",
+        "Create the tables:    {{ pm.run }} db:push"
+    ]
+}

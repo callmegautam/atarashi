@@ -1,195 +1,194 @@
-# ATARASHI
+# Atarashi
 
-![NPM Downloads](https://img.shields.io/npm/dm/atarashi)
-![NPM Version](https://img.shields.io/npm/v/atarashi)
-![NPM Last Update](https://img.shields.io/npm/last-update/atarashi)
+[![npm version](https://img.shields.io/npm/v/atarashi)](https://www.npmjs.com/package/atarashi)
+[![npm downloads](https://img.shields.io/npm/dm/atarashi)](https://www.npmjs.com/package/atarashi)
+[![license](https://img.shields.io/npm/l/atarashi)](./LICENSE)
 
-**Atarashi** is a collection of pre-made templates for rapid development using various frameworks and technologies. Whether you're starting a new project or need to quickly prototype an idea, Atarashi has got you covered with its easy-to-use, production-ready templates.
+**Scaffold a project by choosing what it should do, not which template folder to
+copy.**
 
----
+Atarashi builds a project out of small composable units called blueprints. You
+pick capabilities (an HTTP framework, a database, an ORM, auth, testing) and it
+resolves them, renders them, and merges them into one coherent project. It
+refuses combinations that cannot work, fills in what you forgot, and writes
+nothing until the whole plan is valid.
 
-## 📦 Installation
+```bash
+npx atarashi@latest new my-api --preset backend-ts --yes
+cd my-api && pnpm dev
+```
 
-Install Atarashi globally using `npm`:
+That project installs, builds, lints, tests, boots, and answers `GET /health`
+with no edits from you. That is the bar every generated project has to clear.
+
+<!-- TODO(M7): replace with the recorded demo; see demo/README.md -->
+
+## Why not templates
+
+A template folder is a snapshot of one set of decisions. Change one of them and
+you are hand-editing generated code forever, and nothing can be added later
+because nothing recorded what you chose.
+
+Atarashi records the decisions instead of the output:
+
+```bash
+atarashi new my-api --http fastify --db postgres --orm drizzle --auth jwt
+cd my-api
+atarashi add obs/pino          # three weeks later, in the same project
+```
+
+`atarashi add` re-renders what the new blueprint would have contributed and
+splices it into your existing files at the slot regions. Files you have edited by
+hand are never silently overwritten.
+
+## Install
 
 ```bash
 npm install -g atarashi
 ```
 
----
+Or don't: `npx atarashi@latest` works forever. Node 20.11+.
 
-## 🚀 Usage
+## Pick what goes in
 
-Initialize a new project with Atarashi:
+**A preset**, a set known to work together:
 
 ```bash
-atarashi
+atarashi new my-api --preset backend-ts
 ```
 
-Follow the interactive CLI to select a template and generate your project.
+| Preset | What it is |
+|---|---|
+| `backend-ts` | Express + Postgres + Drizzle + JWT + Docker, strict TypeScript |
+| `backend-minimal` | Express + TypeScript, validated config, no database |
+| `backend-mongo` | Express + MongoDB + Mongoose |
+| `fullstack-react` | A TypeScript API with a React + Vite + Tailwind front end |
+| `fullstack-angular` | The same with Angular + Tailwind |
+| `frontend-only` | React + Vite + Tailwind on its own |
 
----
+**Shorthands**, the common axes, without learning ids:
 
-## 📁 Available Templates
+```bash
+atarashi new my-api --http hono --db sqlite --orm drizzle --tests vitest --lint biome
+```
 
-### 🐘 `backend-drizzle-postgres`
+**Blueprints**, the real thing underneath. 36 of them:
 
-A backend boilerplate using **Express**, **Drizzle ORM**, and **PostgreSQL**.
+```bash
+atarashi new my-api --add http/fastify --add db/postgres --add orm/drizzle
+atarashi list
+```
 
-#### 🔧 Features
+Or run `atarashi` with no arguments for the wizard.
 
--   Express.js application structure
--   Drizzle ORM + PostgreSQL for typed SQL operations
--   Zod for schema validation
--   JWT-based Authentication and Cookie Parser
--   Modular Architecture with folders like controllers, routes, middlewares, and utils
--   Dockerfile and .env.sample included for easy deployment
--   TSX + Dotenv for development and start scripts
--   Pre-configured scripts: dev, start, build, and db:push
--   Async wrapper utility for cleaner code
+## How composition works
 
-#### 📁 Folder Structure:
+Blueprints never name each other. They declare capabilities:
+
+```json
+{
+  "id": "orm/drizzle",
+  "provides": ["orm", "orm:drizzle"],
+  "requires": ["database:sql"],
+  "conflicts": ["orm"]
+}
+```
+
+So `orm/drizzle` works with Postgres, MySQL or SQLite without knowing which.
+Ask for it alone and Atarashi tells you a database is missing and lists the ones
+that would satisfy it. Ask for two databases and it refuses, naming both. When
+exactly one blueprint can satisfy a requirement, it is added for you.
+
+This indirection is why a project generated weeks ago can still grow a new
+capability, and it is the whole reason the system is built this way.
+
+## What you can count on
+
+- **Nothing is written until the plan is valid.** `--dry-run` prints the plan and
+  writes nothing. A conflict is an error with a suggested fix, never a
+  half-generated directory.
+- **Regeneration is byte-identical.** Every project gets an `atarashi.json`
+  recording the spec. `--from atarashi.json` reproduces it exactly. (Generated
+  secrets in `.env` are the deliberate exception.)
+- **It works offline.** The blueprints ship inside the package; the registry is
+  an optimisation, not a requirement.
+- **Third-party blueprints are not second-class.** They use the same format and
+  the same validator as the first-party ones, and their hooks are sandboxed and
+  require consent.
+- **No runtime dependency.** Nothing Atarashi generates depends on Atarashi.
+  `atarashi eject` cuts the last link whenever you want.
+
+## Commands
 
 ```text
-📁 backend-drizzle-mysql
-├── 📁 public/
-├── 📁 src/
-│   ├── 📁 config/
-│   │   ├── cookies.ts
-│   │   └── env.ts
-│   ├── 📁 controllers/
-│   │   └── index.ts
-│   ├── 📁 db/
-│   │   ├── index.ts
-│   │   └── schema.ts
-│   ├── 📁 middlewares/
-│   │   ├── auth.ts
-│   │   └── error-handler.ts
-│   ├── 📁 routes/
-│   │   └── index.ts
-│   ├── 📁 types/
-│   │   ├── types.ts
-│   │   └── schema.ts
-│   ├── 📁 utils/
-│   │   ├── async-handler.ts
-│   │   ├── index.ts
-│   │   ├── cookie.ts
-│   │   ├── response.ts
-│   │   └── jwt.ts
-│   ├── app.ts
-│   ├── index.ts
-│
-├── .dockerignore
-├── .env.sample
-├── .gitignore
-├── Dockerfile
-├── drizzle.config.ts
-├── package.json
-├── pnpm-lock.yaml
-└── tsconfig.json
-
+atarashi                                  Interactive wizard
+atarashi new <name> [options]             Create a project
+atarashi add <blueprint...>               Add capabilities to an existing project
+atarashi list [blueprints|presets]        Browse what's available
+atarashi info <blueprint>                 Details for one blueprint
+atarashi preset <save|list|delete>        Personal presets
+atarashi config <get|set|unset|list|path> User-level settings
+atarashi registry <subcommand>            update|list|pin|unpin|verify|clear|add|sources
+atarashi doctor [--fix]                   Diagnose environment + project
+atarashi create-blueprint <id>            Scaffold + validate a new blueprint
+atarashi eject                            Inline blueprints into the project
+atarashi completion <bash|zsh|fish>       Shell completions
 ```
 
----
+Full reference: [docs/guide/cli.md](./docs/guide/cli.md).
 
-### 🆕 `backend-drizzle-mysql`
+## Write your own blueprint
 
-Same as the Postgres version, but powered by **MySQL** and `mysql2`.
-
-#### 🔧 Features
-
--   Drizzle ORM with typed MySQL queries
--   Express backend with modular file structure
--   JWT, cookie-parser, dotenv, Zod validation
--   Docker-ready + `.env.sample` + TSX dev scripts
-
----
-
-### 🍃 `backend-mongoose-mongodb`
-
-A production-ready backend template built with **Express** and **Mongoose** for **MongoDB**.
-
-#### 🔧 Features
-
--   MongoDB integration with Mongoose
--   Organized folder structure with support for future models
--   JWT-based authentication
--   Cookie handling with `cookie-parser`
--   Environment variable management with `dotenv`
--   Error handling middleware and async utilities
--   Dev-ready with TSX and TypeScript setup
--   Docker-ready
-
-#### 🗂 Folder Structure
-
-```text
-📁 backend-mongoose-mongodb
-├── 📁 public/
-│   └── .gitkeep
-├── 📁 src/
-│   ├── app.ts
-│   ├── index.ts
-│   ├── 📁 config/
-│   │   ├── cookies.ts
-│   │   └── env.ts
-│   ├── 📁 controllers/
-│   │   └── index.ts
-│   ├── 📁 db/
-│   │   └── index.ts
-│   ├── 📁 middlewares/
-│   │   └── errorHandler.ts
-│   ├── 📁 models/
-│   │   └── .gitkeep
-│   ├── 📁 routes/
-│   │   └── index.routes.ts
-│   └── 📁 utils/
-│       ├── asyncHandler.ts
-│       ├── index.ts
-│       └── jwt.ts
-├── .dockerignore
-├── .env.sample
-├── .gitignore
-├── Dockerfile
-├── drizzle.config.ts
-├── package.json
-├── pnpm-lock.yaml
-└── tsconfig.json
+```bash
+atarashi create-blueprint acme/redis
+atarashi create-blueprint acme/redis --validate ./acme/redis
 ```
 
----
+Publish it as `atarashi-blueprint-*` on npm and anyone can use it:
 
-## 🌟 Features
+```bash
+atarashi new my-api --add npm:atarashi-blueprint-acme-redis
+```
 
--   ⚡ **Rapid Development**: Start coding instantly
--   📦 **Modular Structure**: Easily maintain and scale
--   🧑‍💻 **DX Focused**: Type-safe, hot-reloading, dev-friendly
--   🌍 **Open Source**: Built to be extended by the community
+Guide: [Authoring blueprints](./docs/guide/authoring-blueprints.md).
 
----
+## Documentation
 
-## 🤝 Contributing
+| | |
+|---|---|
+| [Getting started](./docs/guide/getting-started.md) | The 30-second version and the ideas under it |
+| [CLI reference](./docs/guide/cli.md) | Every command and flag |
+| [Blueprint catalogue](./docs/guide/blueprints.md) | All 36 blueprints |
+| [Presets](./docs/guide/presets/) | What each produces, with file trees |
+| [Configuration](./docs/guide/configuration.md) | Settings and precedence |
+| [Recipes](./docs/guide/recipes.md) | Common tasks, start to finish |
+| [Troubleshooting](./docs/guide/troubleshooting.md) | When something goes wrong |
+| [Authoring blueprints](./docs/guide/authoring-blueprints.md) | Writing and publishing one |
+| [Plugin API](./docs/guide/plugin-api.md) | `@atarashi/plugin-kit` in detail |
 
-Pull requests and contributions are **super welcome**!
-If you find a bug, have ideas for improvements, or want to squash bugs — go for it! 🧠
+## Upgrading from v0.6
 
-### How to contribute
+v1 replaces the template-copying engine entirely. Your old command still works
+and tells you what it now maps to:
 
-1.  Fork this repo.
-2.  Create a new branch (`git checkout -b feature/my-new-template`).
-3.  Commit your changes (`git commit -m 'feat: Add my new template'`).
-4.  Push your branch (`git push origin feature/my-new-template`).
-5.  Open a Pull Request 🚀.
+```bash
+atarashi new my-api --preset backend-mongo
+```
 
----
+The old preset names are accepted for one minor cycle with a notice.
 
-## 💬 Let’s Connect
+## Contributing
 
--   🧑‍💻 **GitHub:** [callmegautam](https://github.com/callmegautam)
--   🐦 **X (Twitter):** [@iamgautamsuthar](https://x.com/iamgautamsuthar)
--   📧 **Email:** [iamgautamsuthar@gmail.com](mailto:iamgautamsuthar@gmail.com)
+Blueprints are the most parallelizable work and need no engine knowledge: the
+[authoring guide](./docs/guide/authoring-blueprints.md) is the whole contract. See
+[CONTRIBUTING.md](./CONTRIBUTING.md).
 
-Made with ❤️ by [Gautam Suthar](https://github.com/callmegautam).
+```bash
+pnpm install
+pnpm build
+pnpm release:check    # every gate: typecheck, lint, test, blueprints, packaging, bench, e2e
+```
 
----
+## License
 
-⭐ If you like this project, **please star it** — it helps more developers discover **atarashi**!
+[MIT](./LICENSE)

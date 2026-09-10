@@ -1,0 +1,8 @@
+import { Router } from 'express';
+
+/** Mounted at `/api/v1`. Add your feature routers here. */
+export const router = Router();
+
+router.get('/', (_req, res) => {
+  res.json({ success: true, data: { name: '{{ project.name }}', version: 1 } });
+});

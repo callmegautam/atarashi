@@ -1,0 +1,8 @@
+import { PrismaClient } from '@prisma/client';
+
+export const prisma = new PrismaClient();
+
+/** Fails fast at boot rather than on the first query. */
+export async function checkDatabaseConnection() {
+  await prisma.$queryRaw`SELECT 1`;
+}

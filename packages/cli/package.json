@@ -1,0 +1,66 @@
+{
+    "name": "atarashi",
+    "version": "1.0.0-alpha.0",
+    "description": "Composable project scaffolding. Describe capabilities; get a project that runs.",
+    "type": "module",
+    "license": "MIT",
+    "author": "Gautam Suthar <iamgautamsuthar@gmail.com> (https://www.github.com/callmegautam)",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/callmegautam/atarashi.git",
+        "directory": "packages/cli"
+    },
+    "homepage": "https://github.com/callmegautam/atarashi/tree/main/packages/cli#readme",
+    "bugs": {
+        "url": "https://github.com/callmegautam/atarashi/issues"
+    },
+    "bin": {
+        "atarashi": "./dist/cli.js"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./package.json": "./package.json"
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE",
+        "CHANGELOG.md"
+    ],
+    "engines": {
+        "node": ">=20.11"
+    },
+    "scripts": {
+        "build": "tsup",
+        "typecheck": "tsc --noEmit -p tsconfig.json",
+        "test": "vitest run --coverage",
+        "clean": "rm -rf dist .turbo"
+    },
+    "dependencies": {
+        "@atarashi/blueprints": "workspace:*",
+        "@atarashi/core": "workspace:*",
+        "@atarashi/plugin-kit": "workspace:*",
+        "@atarashi/registry": "workspace:*",
+        "@atarashi/schema": "workspace:*",
+        "@clack/prompts": "^0.11.0",
+        "commander": "^14.0.2",
+        "picocolors": "^1.1.1"
+    },
+    "keywords": [
+        "atarashi",
+        "scaffold",
+        "generator",
+        "boilerplate",
+        "cli",
+        "template"
+    ],
+    "publishConfig": {
+        "access": "public",
+        "provenance": true
+    }
+}

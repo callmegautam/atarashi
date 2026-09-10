@@ -1,0 +1,1354 @@
+# blueprints
+  core/node-ts@1.0.0
+  validation/zod@1.0.0
+  db/postgres@1.0.0
+  orm/drizzle@1.0.0
+  http/express@1.0.0
+  web/angular-tailwind@1.0.0
+  mw/cors@1.0.0
+  mw/helmet@1.0.0
+  mw/error-handler@1.0.0
+  obs/pino@1.0.0
+  auth/jwt@1.0.0
+  infra/docker@1.0.0
+  lint/eslint-prettier@1.0.0
+  test/vitest@1.0.0
+  ci/github@1.0.0
+  meta/editorconfig@1.0.0
+  meta/license@1.0.0
+  meta/readme@1.0.0
+
+# dependencies
+  bcryptjs@^3.0.2  (auth/jwt)
+  cookie-parser@^1.4.7  (auth/jwt)
+  cors@^2.8.5  (mw/cors)
+  dotenv@^17.4.2  (validation/zod)
+  drizzle-orm@^0.44.6  (orm/drizzle)
+  express@^4.21.2  (http/express)
+  helmet@^8.1.0  (mw/helmet)
+  jsonwebtoken@^9.0.2  (auth/jwt)
+  pg@^8.16.3  (db/postgres)
+  pino@^9.13.1  (obs/pino)
+  pino-http@^10.5.0  (obs/pino)
+  zod@^3.25.76  (validation/zod)
+
+# devDependencies
+  @eslint/js@^9.37.0  (lint/eslint-prettier)
+  @types/bcryptjs@^3.0.0  (auth/jwt)
+  @types/cookie-parser@^1.4.9  (auth/jwt)
+  @types/cors@^2.8.19  (mw/cors)
+  @types/express@^4.17.23  (http/express)
+  @types/jsonwebtoken@^9.0.10  (auth/jwt)
+  @types/node@^22.19.0  (core/node-ts)
+  @types/pg@^8.15.5  (db/postgres)
+  @types/supertest@^6.0.3  (test/vitest)
+  @vitest/coverage-v8@^3.2.4  (test/vitest)
+  drizzle-kit@^0.31.5  (orm/drizzle)
+  eslint@^9.37.0  (lint/eslint-prettier)
+  eslint-config-prettier@^10.1.8  (lint/eslint-prettier)
+  pino-pretty@^13.1.2  (obs/pino)
+  prettier@^3.6.2  (lint/eslint-prettier)
+  supertest@^7.1.4  (test/vitest)
+  tsx@^4.20.6  (core/node-ts)
+  typescript@^5.9.3  (core/node-ts)
+  typescript-eslint@^8.45.0  (lint/eslint-prettier)
+  vitest@^3.2.4  (test/vitest)
+
+# next steps
+  Start the dev server:  pnpm run dev
+  Copy `.env.example` to `.env` and fill in the blanks
+  Start PostgreSQL:  pnpm run db:up
+  Set DATABASE_URL in .env
+  Create the tables:  pnpm run db:push
+  Browse the data:    pnpm run db:studio
+  Check the API:  curl http://localhost:3000/health
+  Start the Angular dev server:  pnpm run dev:web
+  Generate a signing key:  openssl rand -hex 32
+  Put it in .env as JWT_SECRET
+  Build the image:  docker build -t my-app .
+  Lint the project:  pnpm run lint
+  Run the tests:  pnpm run test
+  Tests read the same environment as the app, so export your .env before running them
+  Push a branch and open a pull request to see CI run
+  Fill in the blank values in `.env.example` and copy it to `.env`
+
+# files
+  .dockerignore
+  .editorconfig
+  .env.example
+  .github/workflows/ci.yml
+  .gitignore
+  .prettierignore
+  .prettierrc.json
+  Dockerfile
+  LICENSE
+  README.md
+  atarashi.json
+  drizzle.config.ts
+  eslint.config.mjs
+  package.json
+  pnpm-workspace.yaml
+  src/app.ts
+  src/config/env.ts
+  src/db/client.ts
+  src/db/index.ts
+  src/db/schema.ts
+  src/index.ts
+  src/lib/async-handler.ts
+  src/lib/http-error.ts
+  src/lib/http.ts
+  src/lib/jwt.ts
+  src/lib/logger.ts
+  src/lib/password.ts
+  src/middlewares/auth.ts
+  src/middlewares/error-handler.ts
+  src/routes/index.ts
+  tests/health.test.ts
+  tsconfig.json
+  vitest.config.ts
+  web/.postcssrc.json
+  web/angular.json
+  web/package.json
+  web/public/favicon.ico
+  web/src/app/app.config.ts
+  web/src/app/app.css
+  web/src/app/app.html
+  web/src/app/app.routes.ts
+  web/src/app/app.spec.ts
+  web/src/app/app.ts
+  web/src/index.html
+  web/src/main.ts
+  web/src/styles.css
+  web/tsconfig.app.json
+  web/tsconfig.json
+  web/tsconfig.spec.json
+
+────────────────────────────────────────────────────────────────────────
+FILE .dockerignore  (644)
+────────────────────────────────────────────────────────────────────────
+node_modules
+dist
+coverage
+.git
+.gitignore
+.env
+.env.*.local
+Dockerfile
+.dockerignore
+docker-compose.yml
+*.log
+.DS_Store
+
+────────────────────────────────────────────────────────────────────────
+FILE .editorconfig  (644)
+────────────────────────────────────────────────────────────────────────
+# https://editorconfig.org
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab
+
+────────────────────────────────────────────────────────────────────────
+FILE .env.example  (644)
+────────────────────────────────────────────────────────────────────────
+# validation/zod
+# Runtime mode: development, test or production
+NODE_ENV=development
+
+# db/postgres
+# PostgreSQL connection string
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/my_app
+
+# http/express
+# Port the HTTP server listens on
+PORT=3000
+
+# mw/cors
+# Comma-separated list of allowed origins, or * for any
+CORS_ORIGIN=*
+
+# obs/pino
+# Pino log level: trace, debug, info, warn, error or fatal
+LOG_LEVEL=info
+
+# auth/jwt
+# Signing key for access tokens; at least 32 characters
+JWT_SECRET=
+# Access token lifetime, e.g. 30m, 12h, 7d
+JWT_EXPIRES_IN=7d
+
+────────────────────────────────────────────────────────────────────────
+FILE .github/workflows/ci.yml  (644)
+────────────────────────────────────────────────────────────────────────
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # gitleaks scans history, not just the tip.
+          fetch-depth: 0
+      # Doc 09 § T5: a committed `.env` is the leak this catches. The CLI in a
+      # container rather than the action, so it needs no token and no licence.
+      - name: Scan for committed secrets
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest detect --source /repo --redact --verbose
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      - run: pnpm install
+      - run: pnpm run lint
+      - run: pnpm run typecheck
+      - run: pnpm run build
+      - run: pnpm run test
+
+────────────────────────────────────────────────────────────────────────
+FILE .gitignore  (644)
+────────────────────────────────────────────────────────────────────────
+# core/node-ts
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.env*
+!.env.example
+*.log
+.DS_Store
+
+# web/angular-tailwind
+.angular/
+out-tsc/
+
+# lint/eslint-prettier
+.eslintcache
+
+────────────────────────────────────────────────────────────────────────
+FILE .prettierignore  (644)
+────────────────────────────────────────────────────────────────────────
+dist
+coverage
+node_modules
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+────────────────────────────────────────────────────────────────────────
+FILE .prettierrc.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "singleQuote": true,
+  "semi": true,
+  "printWidth": 100,
+  "tabWidth": 2,
+  "trailingComma": "all",
+  "endOfLine": "lf"
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE Dockerfile  (644)
+────────────────────────────────────────────────────────────────────────
+# syntax=docker/dockerfile:1
+
+FROM node:22-alpine AS build
+WORKDIR /app
+RUN corepack enable
+COPY package.json pnpm-lock.yaml* ./
+RUN pnpm install
+COPY . .
+RUN pnpm run build
+
+FROM node:22-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+RUN corepack enable
+COPY package.json pnpm-lock.yaml* ./
+RUN pnpm install
+COPY --from=build /app/dist ./dist
+
+EXPOSE 3000
+USER node
+CMD ["node", "dist/index.js"]
+
+────────────────────────────────────────────────────────────────────────
+FILE LICENSE  (644)
+────────────────────────────────────────────────────────────────────────
+MIT License
+
+Copyright (c) 2026 Ada Lovelace
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+────────────────────────────────────────────────────────────────────────
+FILE README.md  (644)
+────────────────────────────────────────────────────────────────────────
+# my-app
+
+A generated project
+
+## Getting started
+
+```sh
+pnpm install
+cp .env.example .env
+pnpm run dev
+```
+
+The server listens on `PORT` (3000 by default). Check it with:
+
+```sh
+curl http://localhost:3000/health
+```
+
+## Scripts
+
+| Script | What it does |
+| --- | --- |
+| `pnpm run dev` | Run the app with reload on change |
+| `pnpm run build` | Compile TypeScript to `dist/` |
+| `pnpm run start` | Run the compiled output |
+| `pnpm run typecheck` | Typecheck without emitting |
+| `pnpm run dev:web` | Run the frontend in `web/` |
+| `pnpm run build:web` | Build the frontend in `web/` |
+| `pnpm run lint` | Lint the project |
+| `pnpm run format` | Format the project |
+| `pnpm run test` | Run the test suite |
+| `pnpm run db:push` | Apply the schema to the database |
+| `pnpm run db:studio` | Browse the data |
+
+## Configuration
+
+Every variable the app needs is listed in `.env.example` and validated at boot
+by `src/config/env.ts`. The process exits immediately if one is missing
+or malformed, so a misconfigured deploy fails loudly instead of at the first
+request.
+
+## Blueprints
+
+This project was composed from:
+
+- `core/node-ts` @ 1.0.0
+- `validation/zod` @ 1.0.0
+- `db/postgres` @ 1.0.0
+- `orm/drizzle` @ 1.0.0
+- `http/express` @ 1.0.0
+- `web/angular-tailwind` @ 1.0.0
+- `mw/cors` @ 1.0.0
+- `mw/helmet` @ 1.0.0
+- `mw/error-handler` @ 1.0.0
+- `obs/pino` @ 1.0.0
+- `auth/jwt` @ 1.0.0
+- `infra/docker` @ 1.0.0
+- `lint/eslint-prettier` @ 1.0.0
+- `test/vitest` @ 1.0.0
+- `ci/github` @ 1.0.0
+- `meta/editorconfig` @ 1.0.0
+- `meta/license` @ 1.0.0
+- `meta/readme` @ 1.0.0
+
+`atarashi.json` records that selection. Add another capability with:
+
+```sh
+pnpm dlx atarashi add <blueprint>
+```
+
+────────────────────────────────────────────────────────────────────────
+FILE atarashi.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "$schema": "https://unpkg.com/@atarashi/schema/schemas/atarashi.schema.json",
+  "specVersion": 1,
+  "atarashiVersion": "1.0.0",
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "name": "my-app",
+  "blueprints": [
+    {
+      "id": "core/node-ts",
+      "version": "1.0.0"
+    },
+    {
+      "id": "validation/zod",
+      "version": "1.0.0"
+    },
+    {
+      "id": "db/postgres",
+      "version": "1.0.0"
+    },
+    {
+      "id": "orm/drizzle",
+      "version": "1.0.0"
+    },
+    {
+      "id": "http/express",
+      "version": "1.0.0"
+    },
+    {
+      "id": "web/angular-tailwind",
+      "version": "1.0.0"
+    },
+    {
+      "id": "mw/cors",
+      "version": "1.0.0"
+    },
+    {
+      "id": "mw/helmet",
+      "version": "1.0.0"
+    },
+    {
+      "id": "mw/error-handler",
+      "version": "1.0.0"
+    },
+    {
+      "id": "obs/pino",
+      "version": "1.0.0"
+    },
+    {
+      "id": "auth/jwt",
+      "version": "1.0.0"
+    },
+    {
+      "id": "infra/docker",
+      "version": "1.0.0"
+    },
+    {
+      "id": "lint/eslint-prettier",
+      "version": "1.0.0"
+    },
+    {
+      "id": "test/vitest",
+      "version": "1.0.0"
+    },
+    {
+      "id": "ci/github",
+      "version": "1.0.0"
+    },
+    {
+      "id": "meta/editorconfig",
+      "version": "1.0.0"
+    },
+    {
+      "id": "meta/license",
+      "version": "1.0.0"
+    },
+    {
+      "id": "meta/readme",
+      "version": "1.0.0"
+    }
+  ],
+  "answers": {
+    "auth.expiry": "7d",
+    "db.name": "my_app",
+    "db.pool": true
+  },
+  "options": {
+    "packageManager": "pnpm",
+    "git": true,
+    "install": true,
+    "format": true,
+    "initialCommit": true,
+    "license": "MIT",
+    "author": {
+      "name": "Ada Lovelace",
+      "email": "ada@example.com"
+    },
+    "writeEnv": false,
+    "force": false
+  },
+  "description": "A generated project",
+  "preset": "preset/fullstack-angular"
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE drizzle.config.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { defineConfig } from 'drizzle-kit';
+
+/**
+ * drizzle-kit loads this file with its own bundler, outside the app's module
+ * graph, so it reads the environment directly rather than importing `env`.
+ */
+const url = process.env.DATABASE_URL;
+
+if (!url) {
+  throw new Error('DATABASE_URL is not set; drizzle-kit cannot connect.');
+}
+
+export default defineConfig({
+  schema: './src/db/schema.ts',
+  out: './drizzle',
+  dialect: 'postgresql',
+  dbCredentials: { url },
+  migrations: {
+    table: '__drizzle_migrations',
+  },
+});
+
+────────────────────────────────────────────────────────────────────────
+FILE eslint.config.mjs  (644)
+────────────────────────────────────────────────────────────────────────
+import eslint from '@eslint/js';
+import prettier from 'eslint-config-prettier';
+import tseslint from 'typescript-eslint';
+
+export default tseslint.config(
+  { ignores: ['dist/**', 'coverage/**', 'node_modules/**'] },
+  eslint.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+    },
+  },
+  prettier,
+);
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A generated project",
+  "license": "MIT",
+  "author": "Ada Lovelace <ada@example.com>",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:web": "cd web && pnpm run build",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "dev": "tsx watch src/index.ts",
+    "dev:web": "cd web && pnpm run dev",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "^0.44.6",
+    "express": "^4.21.2",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.16.3",
+    "pino": "^9.13.1",
+    "pino-http": "^10.5.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.37.0",
+    "@types/bcryptjs": "^3.0.0",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.23",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^22.19.0",
+    "@types/pg": "^8.15.5",
+    "@types/supertest": "^6.0.3",
+    "@vitest/coverage-v8": "^3.2.4",
+    "drizzle-kit": "^0.31.5",
+    "eslint": "^9.37.0",
+    "eslint-config-prettier": "^10.1.8",
+    "pino-pretty": "^13.1.2",
+    "prettier": "^3.6.2",
+    "supertest": "^7.1.4",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.45.0",
+    "vitest": "^3.2.4"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE pnpm-workspace.yaml  (644)
+────────────────────────────────────────────────────────────────────────
+allowBuilds:
+  esbuild: true
+onlyBuiltDependencies:
+  - esbuild
+
+────────────────────────────────────────────────────────────────────────
+FILE src/app.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import express from 'express';
+
+import { router } from './routes/index.js';
+// #region atarashi:imports
+import { env } from './config/env.js';
+import cors from 'cors';
+import helmet from 'helmet';
+import { errorHandler } from './middlewares/error-handler.js';
+import { pinoHttp } from 'pino-http';
+import { logger } from './lib/logger.js';
+import cookieParser from 'cookie-parser';
+
+// #endregion
+
+const app = express();
+
+app.disable('x-powered-by');
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true }));
+// #region atarashi:middleware
+app.use(
+  cors({
+    origin: env.CORS_ORIGIN === '*' ? true : env.CORS_ORIGIN.split(','),
+    credentials: true,
+  }),
+);
+app.use(helmet());
+app.use(pinoHttp({ logger }));
+app.use(cookieParser());
+// #endregion
+
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime() });
+});
+
+app.use('/api/v1', router);
+// #region atarashi:routes
+// #endregion
+
+app.use((_req, res) => {
+  res.status(404).json({ success: false, error: 'Not found' });
+});
+// #region atarashi:error-handlers
+app.use(errorHandler);
+// #endregion
+
+export { app };
+
+────────────────────────────────────────────────────────────────────────
+FILE src/config/env.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { config } from 'dotenv';
+import { z } from 'zod';
+
+// Loads `.env` when one is present, before anything reads `process.env`. A
+// missing file is not an error: in production the platform supplies the
+// environment, and `dotenv` leaves whatever is already set untouched.
+config({ quiet: true });
+
+/**
+ * The single source of truth for configuration. Every blueprint that needs an
+ * environment variable contributes its line to the region below, so the shape
+ * of `env` always matches `.env.example`.
+ */
+const schema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  // #region atarashi:env-schema
+  DATABASE_URL: z.string().min(1),
+  PORT: z.coerce.number().int().positive().default(3000),
+  CORS_ORIGIN: z.string().default('*'),
+  LOG_LEVEL: z.enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal']).default('info'),
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
+  JWT_EXPIRES_IN: z.string().default('7d'),
+  // #endregion
+});
+
+const parsed = schema.safeParse(process.env);
+
+if (!parsed.success) {
+  console.error('Invalid environment variables:');
+  for (const issue of parsed.error.issues) {
+    console.error(`  - ${issue.path.join('.') || '(root)'}: ${issue.message}`);
+  }
+  process.exit(1);
+}
+
+export const env = parsed.data;
+export type Env = typeof env;
+
+────────────────────────────────────────────────────────────────────────
+FILE src/db/client.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { Pool } from 'pg';
+
+import { env } from '../config/env.js';
+
+export const pool = new Pool({
+  connectionString: env.DATABASE_URL,
+  max: 10,
+});
+
+/** Fails fast at boot rather than on the first request. */
+export async function checkDatabaseConnection() {
+  const client = await pool.connect();
+  try {
+    await client.query('SELECT 1');
+  } finally {
+    client.release();
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/db/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { drizzle } from 'drizzle-orm/node-postgres';
+
+import { pool } from './client.js';
+import * as schema from './schema.js';
+
+export const db = drizzle(pool, { schema });
+
+export type Database = typeof db;
+
+────────────────────────────────────────────────────────────────────────
+FILE src/db/schema.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+
+/** A starter table. Delete it once you have a real one. */
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  email: text('email').notNull().unique(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }),
+});
+
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+
+────────────────────────────────────────────────────────────────────────
+FILE src/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+// #region atarashi:imports
+import { checkDatabaseConnection } from './db/client.js';
+import { app } from './app.js';
+import { env } from './config/env.js';
+
+// #endregion
+
+// #region atarashi:bootstrap
+await checkDatabaseConnection();
+app.listen(env.PORT, () => {
+  console.log(`my-app listening on http://localhost:${env.PORT}`);
+});
+// #endregion
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/async-handler.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
+
+/**
+ * Wraps an async route handler so a rejected promise reaches the error
+ * middleware instead of becoming an unhandled rejection.
+ */
+export const asyncHandler =
+  (handler: RequestHandler): RequestHandler =>
+  (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(handler(req, res, next)).catch(next);
+  };
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/http-error.ts  (644)
+────────────────────────────────────────────────────────────────────────
+/**
+ * The one error type route handlers should throw. Anything else reaching the
+ * handler is treated as a bug and reported as a 500 without leaking details.
+ */
+export class HttpError extends Error {
+  readonly status: number;
+  readonly details: unknown;
+
+  constructor(status: number, message: string, details?: unknown) {
+    super(message);
+    this.name = 'HttpError';
+    this.status = status;
+    this.details = details;
+  }
+
+  static badRequest(message = 'Bad request', details?: unknown) {
+    return new HttpError(400, message, details);
+  }
+
+  static unauthorized(message = 'Authentication required') {
+    return new HttpError(401, message);
+  }
+
+  static forbidden(message = 'Forbidden') {
+    return new HttpError(403, message);
+  }
+
+  static notFound(message = 'Not found') {
+    return new HttpError(404, message);
+  }
+
+  static conflict(message = 'Conflict') {
+    return new HttpError(409, message);
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/http.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import type { Response } from 'express';
+
+export const HttpStatus = Object.freeze({
+  OK: 200,
+  CREATED: 201,
+  NO_CONTENT: 204,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  CONFLICT: 409,
+  UNPROCESSABLE_ENTITY: 422,
+  TOO_MANY_REQUESTS: 429,
+  INTERNAL_SERVER_ERROR: 500,
+});
+
+export type HttpStatusCode = (typeof HttpStatus)[keyof typeof HttpStatus];
+
+export interface ApiSuccess<T> {
+  success: true;
+  data: T;
+}
+
+export interface ApiFailure {
+  success: false;
+  error: string;
+  details?: unknown;
+}
+
+export function sendSuccess<T>(res: Response, data: T, status: number = HttpStatus.OK) {
+  const body: ApiSuccess<T> = { success: true, data };
+  return res.status(status).json(body);
+}
+
+export function sendError(
+  res: Response,
+  error: string,
+  status: number = HttpStatus.INTERNAL_SERVER_ERROR,
+  details?: unknown,
+) {
+  const body: ApiFailure = { success: false, error, ...(details === undefined ? {} : { details }) };
+  return res.status(status).json(body);
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/jwt.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import jwt from 'jsonwebtoken';
+import type { SignOptions } from 'jsonwebtoken';
+
+import { env } from '../config/env.js';
+
+export interface TokenPayload {
+  /** The subject — normally the user id. */
+  sub: string;
+  [claim: string]: unknown;
+}
+
+export function signToken(payload: TokenPayload, options: SignOptions = {}): string {
+  return jwt.sign(payload, env.JWT_SECRET, {
+    expiresIn: env.JWT_EXPIRES_IN as SignOptions['expiresIn'],
+    ...options,
+  });
+}
+
+export function verifyToken(token: string): TokenPayload {
+  return jwt.verify(token, env.JWT_SECRET) as TokenPayload;
+}
+
+export function decodeToken(token: string): TokenPayload | null {
+  return jwt.decode(token) as TokenPayload | null;
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/logger.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import pino from 'pino';
+
+import { env } from '../config/env.js';
+
+/**
+ * Pretty, colourised lines while developing; newline-delimited JSON in
+ * production, where a log shipper is reading them.
+ */
+export const logger = pino({
+  level: env.LOG_LEVEL,
+  ...(env.NODE_ENV === 'production'
+    ? {}
+    : { transport: { target: 'pino-pretty', options: { colorize: true } } }),
+});
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/password.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import bcrypt from 'bcryptjs';
+
+const ROUNDS = 12;
+
+export function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, ROUNDS);
+}
+
+export function verifyPassword(password: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(password, hash);
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/middlewares/auth.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import type { NextFunction, Request, Response } from 'express';
+
+import { HttpStatus, sendError } from '../lib/http.js';
+import { verifyToken } from '../lib/jwt.js';
+import type { TokenPayload } from '../lib/jwt.js';
+
+export interface AuthenticatedRequest extends Request {
+  user?: TokenPayload;
+}
+
+/** Accepts `Authorization: Bearer <token>` first, then a `token` cookie. */
+export function requireAuth(req: Request, res: Response, next: NextFunction) {
+  const header = req.headers.authorization;
+  const bearer = header?.startsWith('Bearer ') ? header.slice('Bearer '.length) : undefined;
+  const token = bearer ?? (req.cookies?.token as string | undefined);
+
+  if (!token) {
+    sendError(res, 'Authentication required', HttpStatus.UNAUTHORIZED);
+    return;
+  }
+
+  try {
+    (req as AuthenticatedRequest).user = verifyToken(token);
+    next();
+  } catch {
+    sendError(res, 'Invalid or expired token', HttpStatus.UNAUTHORIZED);
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/middlewares/error-handler.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import type { NextFunction, Request, Response } from 'express';
+import { ZodError } from 'zod';
+
+import { env } from '../config/env.js';
+import { HttpError } from '../lib/http-error.js';
+
+/**
+ * Express identifies an error handler by its four parameters, so `next` stays
+ * in the signature even though it is unused on the happy path.
+ */
+export function errorHandler(error: unknown, _req: Request, res: Response, next: NextFunction) {
+  if (res.headersSent) {
+    next(error);
+    return;
+  }
+
+  if (error instanceof ZodError) {
+    res.status(422).json({ success: false, error: 'Validation failed', details: error.issues });
+    return;
+  }
+
+  if (error instanceof HttpError) {
+    res.status(error.status).json({
+      success: false,
+      error: error.message,
+      ...(error.details === undefined ? {} : { details: error.details }),
+    });
+    return;
+  }
+
+  if (env.NODE_ENV !== 'production') {
+    console.error(error);
+  }
+
+  res.status(500).json({ success: false, error: 'Internal server error' });
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/routes/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { Router } from 'express';
+
+/** Mounted at `/api/v1`. Add your feature routers here. */
+export const router = Router();
+
+router.get('/', (_req, res) => {
+  res.json({ success: true, data: { name: 'my-app', version: 1 } });
+});
+
+────────────────────────────────────────────────────────────────────────
+FILE tests/health.test.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import request from 'supertest';
+import { describe, expect, it } from 'vitest';
+
+import { app } from '../src/app.js';
+
+describe('GET /health', () => {
+  it('reports the service as healthy', async () => {
+    const response = await request(app).get('/health');
+
+    expect(response.status).toBe(200);
+    expect(response.body.status).toBe('ok');
+  });
+});
+
+────────────────────────────────────────────────────────────────────────
+FILE tsconfig.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "src",
+    "outDir": "dist",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "verbatimModuleSyntax": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE vitest.config.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    environment: 'node',
+    // A new project has no tests yet; that is not a failure.
+    passWithNoTests: true,
+    include: ['tests/**/*.test.ts'],
+    coverage: {
+      provider: 'v8',
+      include: ['src/**'],
+      reporter: ['text', 'lcov'],
+    },
+  },
+});
+
+────────────────────────────────────────────────────────────────────────
+FILE web/.postcssrc.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "plugins": {
+    "@tailwindcss/postcss": {}
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE web/angular.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "my-app": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "src/main.ts",
+            "tsConfig": "tsconfig.app.json",
+            "assets": [{ "glob": "**/*", "input": "public" }],
+            "styles": ["src/styles.css"]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                { "type": "initial", "maximumWarning": "500kB", "maximumError": "1MB" },
+                { "type": "anyComponentStyle", "maximumWarning": "4kB", "maximumError": "8kB" }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": { "buildTarget": "my-app:build:production" },
+            "development": { "buildTarget": "my-app:build:development" }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test"
+        }
+      }
+    }
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE web/package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app-web",
+  "private": true,
+  "scripts": {
+    "dev": "ng serve",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+  },
+  "dependencies": {
+    "@angular/common": "^21.0.0",
+    "@angular/compiler": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/forms": "^21.0.0",
+    "@angular/platform-browser": "^21.0.0",
+    "@angular/router": "^21.0.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.8.1"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.0.2",
+    "@angular/cli": "^21.0.2",
+    "@angular/compiler-cli": "^21.0.0",
+    "@tailwindcss/postcss": "^4.1.12",
+    "jsdom": "^27.1.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.12",
+    "typescript": "~5.9.3",
+    "vitest": "^4.0.8"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE web/public/favicon.ico  (644)
+────────────────────────────────────────────────────────────────────────
+<binary, 15086 bytes>
+
+────────────────────────────────────────────────────────────────────────
+FILE web/src/app/app.config.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideRouter } from '@angular/router';
+
+import { routes } from './app.routes';
+
+export const appConfig: ApplicationConfig = {
+  providers: [provideBrowserGlobalErrorListeners(), provideRouter(routes)],
+};
+
+────────────────────────────────────────────────────────────────────────
+FILE web/src/app/app.css  (644)
+────────────────────────────────────────────────────────────────────────
+
+
+────────────────────────────────────────────────────────────────────────
+FILE web/src/app/app.html  (644)
+────────────────────────────────────────────────────────────────────────
+<main class="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-6">
+  <section class="max-w-xl text-center space-y-4">
+    <h1 class="text-4xl font-semibold tracking-tight"> title() </h1>
+    <p class="text-slate-400">
+      Angular and Tailwind are wired up. Edit
+      <code class="rounded bg-slate-800 px-1.5 py-0.5 text-sm">src/app/app.html</code> to begin.
+    </p>
+  </section>
+</main>
+
+<router-outlet />
+
+────────────────────────────────────────────────────────────────────────
+FILE web/src/app/app.routes.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [];
+
+────────────────────────────────────────────────────────────────────────
+FILE web/src/app/app.spec.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { TestBed } from '@angular/core/testing';
+
+import { App } from './app';
+
+describe('App', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({ imports: [App] }).compileComponents();
+  });
+
+  it('creates the app', () => {
+    const fixture = TestBed.createComponent(App);
+    expect(fixture.componentInstance).toBeTruthy();
+  });
+
+  it('renders the project title', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('h1')?.textContent).toContain('my-app');
+  });
+});
+
+────────────────────────────────────────────────────────────────────────
+FILE web/src/app/app.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { Component, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+
+@Component({
+  selector: 'app-root',
+  imports: [RouterOutlet],
+  templateUrl: './app.html',
+  styleUrl: './app.css',
+})
+export class App {
+  protected readonly title = signal('my-app');
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE web/src/index.html  (644)
+────────────────────────────────────────────────────────────────────────
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>my-app</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  </head>
+  <body>
+    <app-root></app-root>
+  </body>
+</html>
+
+────────────────────────────────────────────────────────────────────────
+FILE web/src/main.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { bootstrapApplication } from '@angular/platform-browser';
+
+import { App } from './app/app';
+import { appConfig } from './app/app.config';
+
+bootstrapApplication(App, appConfig).catch((error) => console.error(error));
+
+────────────────────────────────────────────────────────────────────────
+FILE web/src/styles.css  (644)
+────────────────────────────────────────────────────────────────────────
+@import 'tailwindcss';
+
+────────────────────────────────────────────────────────────────────────
+FILE web/tsconfig.app.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/app",
+    "types": []
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts"]
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE web/tsconfig.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "preserve"
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  },
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.spec.json" }]
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE web/tsconfig.spec.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec",
+    "types": ["vitest/globals"]
+  },
+  "include": ["src/**/*.d.ts", "src/**/*.spec.ts"]
+}

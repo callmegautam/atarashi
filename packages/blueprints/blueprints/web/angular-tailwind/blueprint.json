@@ -1,0 +1,115 @@
+{
+    "manifestVersion": 1,
+    "id": "web/angular-tailwind",
+    "name": "Angular + Tailwind",
+    "version": "1.0.0",
+    "description": "Standalone-component Angular app with Tailwind v4 via PostCSS and Vitest for unit tests.",
+    "category": "frontend",
+    "tags": ["angular", "tailwind", "frontend", "spa"],
+    "provides": ["ui", "ui:angular"],
+    "conflicts": ["ui"],
+    "requires": ["language:typescript"],
+    "after": ["core/node-ts"],
+    "priority": 55,
+    "engines": {
+        "atarashi": ">=1.0.0-0 <2.0.0",
+        "node": ">=20.19"
+    },
+    "files": [
+        {
+            "from": "files/package.json.hbs",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}package.json",
+            "merge": "json-deep"
+        },
+        {
+            "from": "files/angular.json.hbs",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}angular.json"
+        },
+        {
+            "from": "files/tsconfig.json.hbs",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}tsconfig.json"
+        },
+        {
+            "from": "files/tsconfig.app.json",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}tsconfig.app.json"
+        },
+        {
+            "from": "files/tsconfig.spec.json",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}tsconfig.spec.json"
+        },
+        {
+            "from": "files/_postcssrc.json",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}.postcssrc.json"
+        },
+        {
+            "from": "files/src/index.html.hbs",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}src/index.html",
+            "escape": true
+        },
+        {
+            "from": "files/src/main.ts",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}src/main.ts"
+        },
+        {
+            "from": "files/src/styles.css",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}src/styles.css"
+        },
+        {
+            "from": "files/src/app/app.ts.hbs",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}src/app/app.ts"
+        },
+        {
+            "from": "files/src/app/app.config.ts",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}src/app/app.config.ts"
+        },
+        {
+            "from": "files/src/app/app.routes.ts",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}src/app/app.routes.ts"
+        },
+        {
+            "from": "files/src/app/app.html.hbs",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}src/app/app.html",
+            "escape": true
+        },
+        {
+            "from": "files/src/app/app.css",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}src/app/app.css"
+        },
+        {
+            "from": "files/src/app/app.spec.ts.hbs",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}src/app/app.spec.ts"
+        },
+        {
+            "from": "files/public/favicon.ico",
+            "to": "{{#when \"provides('http')\"}}web/{{/when}}public/favicon.ico",
+            "render": false
+        }
+    ],
+    "scripts": {
+        "dev:web": {
+            "value": "cd web && {{ pm.run }} dev",
+            "when": "provides('http')"
+        },
+        "build:web": {
+            "value": "cd web && {{ pm.run }} build",
+            "when": "provides('http')"
+        }
+    },
+    "gitignore": [".angular/", "dist/", "out-tsc/"],
+    "nextSteps": [
+        "Start the Angular dev server:  {{#when \"provides('http')\"}}{{ pm.run }} dev:web{{else}}{{ pm.run }} dev{{/when}}"
+    ],
+    "contributions": [
+        {
+            "target": "pnpm-workspace.yaml",
+            "merge": "yaml-deep",
+            "value": {
+                "allowBuilds": {
+                    "esbuild": true
+                },
+                "onlyBuiltDependencies": ["esbuild"]
+            },
+            "when": "pm.name === 'pnpm'"
+        }
+    ]
+}

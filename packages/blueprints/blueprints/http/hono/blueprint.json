@@ -1,0 +1,58 @@
+{
+    "manifestVersion": 1,
+    "id": "http/hono",
+    "name": "Hono",
+    "version": "1.0.0",
+    "description": "Hono HTTP server on the Node adapter, with a health check and a versioned route prefix.",
+    "category": "http",
+    "tags": ["hono", "http", "server", "rest"],
+    "provides": ["http", "http:hono"],
+    "conflicts": ["http"],
+    "requires": ["runtime:node", "config:env"],
+    "after": ["core/node-ts", "core/node-js", "validation/zod"],
+    "priority": 50,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "files": [
+        {
+            "from": "files/src/app.ts.hbs",
+            "to": "src/app.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}"
+        }
+    ],
+    "dependencies": { "hono": "^4.9.10", "@hono/node-server": "^1.19.5" },
+    "env": [
+        {
+            "key": "PORT",
+            "sample": "3000",
+            "description": "Port the HTTP server listens on",
+            "required": false
+        }
+    ],
+    "contributions": [
+        {
+            "target": "src/config/env.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "env-schema",
+            "value": "PORT: z.coerce.number().int().positive().default(3000),"
+        },
+        {
+            "target": "src/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { serve } from '@hono/node-server';"
+        },
+        {
+            "target": "src/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { app } from './app.js';"
+        },
+        {
+            "target": "src/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { env } from './config/env.js';"
+        },
+        {
+            "target": "src/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "bootstrap",
+            "value": "serve({ fetch: app.fetch, port: env.PORT }, (info) => {\n  console.log(`{{ project.name }} listening on http://localhost:${info.port}`);\n});"
+        }
+    ],
+    "nextSteps": ["Check the API:  curl http://localhost:3000/health"]
+}

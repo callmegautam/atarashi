@@ -1,0 +1,77 @@
+# validation/zod
+
+# dependencies
+      dotenv@^17.4.2
+      zod@^3.25.76
+
+# files
+  .env.example  [validation/zod]
+  package.json  [core/node-ts, validation/zod, atarashi]
+  src/config/env.ts  [validation/zod]
+
+────────────────────────────────────────────────────────────────────────
+FILE .env.example  (644)
+────────────────────────────────────────────────────────────────────────
+# Runtime mode: development, test or production
+NODE_ENV=development
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/config/env.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { config } from 'dotenv';
+import { z } from 'zod';
+
+// Loads `.env` when one is present, before anything reads `process.env`. A
+// missing file is not an error: in production the platform supplies the
+// environment, and `dotenv` leaves whatever is already set untouched.
+config({ quiet: true });
+
+/**
+ * The single source of truth for configuration. Every blueprint that needs an
+ * environment variable contributes its line to the region below, so the shape
+ * of `env` always matches `.env.example`.
+ */
+const schema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  // #region atarashi:env-schema
+  // #endregion
+});
+
+const parsed = schema.safeParse(process.env);
+
+if (!parsed.success) {
+  console.error('Invalid environment variables:');
+  for (const issue of parsed.error.issues) {
+    console.error(`  - ${issue.path.join('.') || '(root)'}: ${issue.message}`);
+  }
+  process.exit(1);
+}
+
+export const env = parsed.data;
+export type Env = typeof env;

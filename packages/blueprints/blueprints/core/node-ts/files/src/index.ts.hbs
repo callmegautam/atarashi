@@ -1,0 +1,6 @@
+{{> slot "imports" }}
+
+{{> slot "bootstrap" }}
+{{#when "!provides('http')"}}
+console.log('{{ project.name }} is running.');
+{{/when}}

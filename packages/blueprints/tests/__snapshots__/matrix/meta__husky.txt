@@ -1,0 +1,50 @@
+# meta/husky
+
+# dependencies
+  dev husky@^9.1.7
+  dev lint-staged@^16.2.7
+
+# files
+  .husky/pre-commit  [meta/husky]
+  package.json  [core/node-ts, lint/biome, meta/husky, atarashi]
+
+────────────────────────────────────────────────────────────────────────
+FILE .husky/pre-commit  (755)
+────────────────────────────────────────────────────────────────────────
+#!/usr/bin/env sh
+npx lint-staged
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "prepare": "husky",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.14",
+    "@types/node": "^22.19.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  },
+  "lint-staged": {
+    "*.{ts,js,mjs,cjs,json,jsonc}": [
+      "biome check --write --no-errors-on-unmatched"
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+    "manifestVersion": 1,
+    "kind": "preset",
+    "id": "preset/backend-minimal",
+    "name": "Minimal TypeScript API",
+    "version": "1.0.0",
+    "description": "Express and TypeScript with validated config and one error shape. No database.",
+    "tags": ["backend", "typescript", "express", "minimal"],
+    "blueprints": [
+        "core/node-ts",
+        "validation/zod",
+        "http/express",
+        "mw/error-handler",
+        "lint/biome",
+        "meta/readme",
+        "meta/editorconfig"
+    ],
+    "answers": {}
+}

@@ -1,0 +1,13 @@
+import { MongoClient } from 'mongodb';
+
+import { env } from '../config/env.js';
+
+export const client = new MongoClient(env.MONGODB_URI);
+
+export const database = client.db();
+
+/** Fails fast at boot rather than on the first query. */
+export async function connectDatabase() {
+  await client.connect();
+  await database.command({ ping: 1 });
+}

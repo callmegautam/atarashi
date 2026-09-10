@@ -1,0 +1,391 @@
+# blueprints
+  core/node-ts@1.0.0
+  web/react-vite-tailwind@1.0.0
+  lint/biome@1.0.0
+  meta/editorconfig@1.0.0
+  meta/license@1.0.0
+  meta/readme@1.0.0
+
+# dependencies
+
+# devDependencies
+  @biomejs/biome@^2.3.14  (lint/biome)
+  @types/node@^22.19.0  (core/node-ts)
+  typescript@^5.9.3  (core/node-ts)
+
+# next steps
+  Start the dev server:  pnpm run dev
+  Start the Vite dev server:  pnpm run dev
+  Lint the project:  pnpm run lint
+
+# files
+  .editorconfig
+  .gitignore
+  LICENSE
+  README.md
+  atarashi.json
+  biome.json
+  index.html
+  package.json
+  pnpm-workspace.yaml
+  src/App.tsx
+  src/index.css
+  src/main.tsx
+  src/vite-env.d.ts
+  tsconfig.app.json
+  tsconfig.json
+  tsconfig.node.json
+  vite.config.ts
+
+────────────────────────────────────────────────────────────────────────
+FILE .editorconfig  (644)
+────────────────────────────────────────────────────────────────────────
+# https://editorconfig.org
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab
+
+────────────────────────────────────────────────────────────────────────
+FILE .gitignore  (644)
+────────────────────────────────────────────────────────────────────────
+# core/node-ts
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.env*
+!.env.example
+*.log
+.DS_Store
+
+# web/react-vite-tailwind
+.vite/
+
+────────────────────────────────────────────────────────────────────────
+FILE LICENSE  (644)
+────────────────────────────────────────────────────────────────────────
+MIT License
+
+Copyright (c) 2026 Ada Lovelace
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+────────────────────────────────────────────────────────────────────────
+FILE README.md  (644)
+────────────────────────────────────────────────────────────────────────
+# my-app
+
+A generated project
+
+## Getting started
+
+```sh
+pnpm install
+pnpm run dev
+```
+
+
+## Scripts
+
+| Script | What it does |
+| --- | --- |
+| `pnpm run lint` | Lint the project |
+| `pnpm run format` | Format the project |
+
+
+## Blueprints
+
+This project was composed from:
+
+- `core/node-ts` @ 1.0.0
+- `web/react-vite-tailwind` @ 1.0.0
+- `lint/biome` @ 1.0.0
+- `meta/editorconfig` @ 1.0.0
+- `meta/license` @ 1.0.0
+- `meta/readme` @ 1.0.0
+
+`atarashi.json` records that selection. Add another capability with:
+
+```sh
+pnpm dlx atarashi add <blueprint>
+```
+
+────────────────────────────────────────────────────────────────────────
+FILE atarashi.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "$schema": "https://unpkg.com/@atarashi/schema/schemas/atarashi.schema.json",
+  "specVersion": 1,
+  "atarashiVersion": "1.0.0",
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "name": "my-app",
+  "blueprints": [
+    {
+      "id": "core/node-ts",
+      "version": "1.0.0"
+    },
+    {
+      "id": "web/react-vite-tailwind",
+      "version": "1.0.0"
+    },
+    {
+      "id": "lint/biome",
+      "version": "1.0.0"
+    },
+    {
+      "id": "meta/editorconfig",
+      "version": "1.0.0"
+    },
+    {
+      "id": "meta/license",
+      "version": "1.0.0"
+    },
+    {
+      "id": "meta/readme",
+      "version": "1.0.0"
+    }
+  ],
+  "answers": {
+    "db.name": "my_app"
+  },
+  "options": {
+    "packageManager": "pnpm",
+    "git": true,
+    "install": true,
+    "format": true,
+    "initialCommit": true,
+    "license": "MIT",
+    "author": {
+      "name": "Ada Lovelace",
+      "email": "ada@example.com"
+    },
+    "writeEnv": false,
+    "force": false
+  },
+  "description": "A generated project",
+  "preset": "preset/frontend-only"
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE biome.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": {
+    "includes": ["**", "!dist/**", "!coverage/**"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": { "quoteStyle": "single", "trailingCommas": "all", "semicolons": "always" }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": { "recommended": true }
+  },
+  "assist": { "actions": { "source": { "organizeImports": "off" } } }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE index.html  (644)
+────────────────────────────────────────────────────────────────────────
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>my-app</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A generated project",
+  "license": "MIT",
+  "author": "Ada Lovelace <ada@example.com>",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b && vite build",
+    "dev": "vite",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "preview": "vite preview",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.14",
+    "@tailwindcss/vite": "^4.1.12",
+    "@types/node": "^22.19.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.0.4",
+    "tailwindcss": "^4.1.12",
+    "typescript": "~5.9.3",
+    "vite": "^7.1.9",
+    "vitest": "^3.2.4"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE pnpm-workspace.yaml  (644)
+────────────────────────────────────────────────────────────────────────
+allowBuilds:
+  esbuild: true
+onlyBuiltDependencies:
+  - esbuild
+
+────────────────────────────────────────────────────────────────────────
+FILE src/App.tsx  (644)
+────────────────────────────────────────────────────────────────────────
+export default function App() {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-slate-950 px-6 text-slate-100">
+      <section className="max-w-xl space-y-4 text-center">
+        <h1 className="text-4xl font-semibold tracking-tight">my-app</h1>
+        <p className="text-slate-400">
+          React, Vite and Tailwind are wired up. Edit{' '}
+          <code className="rounded bg-slate-800 px-1.5 py-0.5 text-sm">src/App.tsx</code> to begin.
+        </p>
+      </section>
+    </main>
+  );
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/index.css  (644)
+────────────────────────────────────────────────────────────────────────
+@import 'tailwindcss';
+
+────────────────────────────────────────────────────────────────────────
+FILE src/main.tsx  (644)
+────────────────────────────────────────────────────────────────────────
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+
+import App from './App';
+import './index.css';
+
+const container = document.getElementById('root');
+
+if (!container) {
+  throw new Error('No #root element in index.html');
+}
+
+createRoot(container).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
+
+────────────────────────────────────────────────────────────────────────
+FILE src/vite-env.d.ts  (644)
+────────────────────────────────────────────────────────────────────────
+/// <reference types="vite/client" />
+
+────────────────────────────────────────────────────────────────────────
+FILE tsconfig.app.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE tsconfig.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE tsconfig.node.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "include": ["vite.config.ts"]
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE vite.config.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  server: { port: 5173 },
+});

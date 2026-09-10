@@ -1,1 +1,25 @@
-node_modules
+node_modules/
+dist/
+dist-registry/
+coverage/
+.turbo/
+*.tsbuildinfo
+
+.env
+.env.*
+!.env.example
+
+*.tgz
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+packages/schema/schemas/
+.codegraph
+.claude
+# Local development notes / internal plans (not published)
+.dev/

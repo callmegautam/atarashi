@@ -1,0 +1,615 @@
+# blueprints
+  core/node-ts@1.0.0
+  validation/zod@1.0.0
+  db/sqlite@1.0.0
+  orm/drizzle@1.0.0
+  http/express@1.0.0
+  auth/jwt@1.0.0
+  test/vitest@1.0.0
+
+# dependencies
+  bcryptjs@^3.0.2  (auth/jwt)
+  better-sqlite3@^13.0.3  (db/sqlite)
+  cookie-parser@^1.4.7  (auth/jwt)
+  dotenv@^17.4.2  (validation/zod)
+  drizzle-orm@^0.44.6  (orm/drizzle)
+  express@^4.21.2  (http/express)
+  jsonwebtoken@^9.0.2  (auth/jwt)
+  zod@^3.25.76  (validation/zod)
+
+# devDependencies
+  @types/bcryptjs@^3.0.0  (auth/jwt)
+  @types/better-sqlite3@^7.6.13  (db/sqlite)
+  @types/cookie-parser@^1.4.9  (auth/jwt)
+  @types/express@^4.17.23  (http/express)
+  @types/jsonwebtoken@^9.0.10  (auth/jwt)
+  @types/node@^22.19.0  (core/node-ts)
+  @types/supertest@^6.0.3  (test/vitest)
+  @vitest/coverage-v8@^3.2.4  (test/vitest)
+  drizzle-kit@^0.31.5  (orm/drizzle)
+  supertest@^7.1.4  (test/vitest)
+  tsx@^4.20.6  (core/node-ts)
+  typescript@^5.9.3  (core/node-ts)
+  vitest@^3.2.4  (test/vitest)
+
+# next steps
+  Start the dev server:  pnpm run dev
+  Copy `.env.example` to `.env` and fill in the blanks
+  The database file is created on first run under `data/`
+  Create the tables:  pnpm run db:push
+  Browse the data:    pnpm run db:studio
+  Check the API:  curl http://localhost:3000/health
+  Generate a signing key:  openssl rand -hex 32
+  Put it in .env as JWT_SECRET
+  Run the tests:  pnpm run test
+  Tests read the same environment as the app, so export your .env before running them
+  Fill in the blank values in `.env.example` and copy it to `.env`
+
+# files
+  .env.example
+  .gitignore
+  atarashi.json
+  drizzle.config.ts
+  package.json
+  pnpm-workspace.yaml
+  src/app.ts
+  src/config/env.ts
+  src/db/client.ts
+  src/db/index.ts
+  src/db/schema.ts
+  src/index.ts
+  src/lib/async-handler.ts
+  src/lib/http.ts
+  src/lib/jwt.ts
+  src/lib/password.ts
+  src/middlewares/auth.ts
+  src/routes/index.ts
+  tests/health.test.ts
+  tsconfig.json
+  vitest.config.ts
+
+────────────────────────────────────────────────────────────────────────
+FILE .env.example  (644)
+────────────────────────────────────────────────────────────────────────
+# validation/zod
+# Runtime mode: development, test or production
+NODE_ENV=development
+
+# db/sqlite
+# SQLite database file, as a `file:` URL
+DATABASE_URL=file:./data/my_app.db
+
+# http/express
+# Port the HTTP server listens on
+PORT=3000
+
+# auth/jwt
+# Signing key for access tokens; at least 32 characters
+JWT_SECRET=
+# Access token lifetime, e.g. 30m, 12h, 7d
+JWT_EXPIRES_IN=7d
+
+────────────────────────────────────────────────────────────────────────
+FILE .gitignore  (644)
+────────────────────────────────────────────────────────────────────────
+# core/node-ts
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.env*
+!.env.example
+*.log
+.DS_Store
+
+# db/sqlite
+data/
+*.db
+*.db-shm
+*.db-wal
+
+────────────────────────────────────────────────────────────────────────
+FILE atarashi.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "$schema": "https://unpkg.com/@atarashi/schema/schemas/atarashi.schema.json",
+  "specVersion": 1,
+  "atarashiVersion": "1.0.0",
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "name": "my-app",
+  "blueprints": [
+    {
+      "id": "core/node-ts",
+      "version": "1.0.0"
+    },
+    {
+      "id": "validation/zod",
+      "version": "1.0.0"
+    },
+    {
+      "id": "db/sqlite",
+      "version": "1.0.0"
+    },
+    {
+      "id": "orm/drizzle",
+      "version": "1.0.0"
+    },
+    {
+      "id": "http/express",
+      "version": "1.0.0"
+    },
+    {
+      "id": "auth/jwt",
+      "version": "1.0.0"
+    },
+    {
+      "id": "test/vitest",
+      "version": "1.0.0"
+    }
+  ],
+  "answers": {
+    "auth.expiry": "7d",
+    "db.name": "my_app",
+    "db.pool": true
+  },
+  "options": {
+    "packageManager": "pnpm",
+    "git": true,
+    "install": true,
+    "format": true,
+    "initialCommit": true,
+    "license": "MIT",
+    "author": {
+      "name": "Ada Lovelace",
+      "email": "ada@example.com"
+    },
+    "writeEnv": false,
+    "force": false
+  },
+  "description": "A generated project"
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE drizzle.config.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { defineConfig } from 'drizzle-kit';
+
+/**
+ * drizzle-kit loads this file with its own bundler, outside the app's module
+ * graph, so it reads the environment directly rather than importing `env`.
+ */
+const url = process.env.DATABASE_URL;
+
+if (!url) {
+  throw new Error('DATABASE_URL is not set; drizzle-kit cannot connect.');
+}
+
+export default defineConfig({
+  schema: './src/db/schema.ts',
+  out: './drizzle',
+  dialect: 'sqlite',
+  dbCredentials: { url },
+  migrations: {
+    table: '__drizzle_migrations',
+  },
+});
+
+────────────────────────────────────────────────────────────────────────
+FILE package.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A generated project",
+  "license": "MIT",
+  "author": "Ada Lovelace <ada@example.com>",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "better-sqlite3": "^13.0.3",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "^0.44.6",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/express": "^4.17.23",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^22.19.0",
+    "@types/supertest": "^6.0.3",
+    "@vitest/coverage-v8": "^3.2.4",
+    "drizzle-kit": "^0.31.5",
+    "supertest": "^7.1.4",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE pnpm-workspace.yaml  (644)
+────────────────────────────────────────────────────────────────────────
+allowBuilds:
+  esbuild: true
+  better-sqlite3: true
+onlyBuiltDependencies:
+  - esbuild
+  - better-sqlite3
+
+────────────────────────────────────────────────────────────────────────
+FILE src/app.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import express from 'express';
+
+import { router } from './routes/index.js';
+// #region atarashi:imports
+import cookieParser from 'cookie-parser';
+
+// #endregion
+
+const app = express();
+
+app.disable('x-powered-by');
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true }));
+// #region atarashi:middleware
+app.use(cookieParser());
+// #endregion
+
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime() });
+});
+
+app.use('/api/v1', router);
+// #region atarashi:routes
+// #endregion
+
+app.use((_req, res) => {
+  res.status(404).json({ success: false, error: 'Not found' });
+});
+// #region atarashi:error-handlers
+// #endregion
+
+export { app };
+
+────────────────────────────────────────────────────────────────────────
+FILE src/config/env.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { config } from 'dotenv';
+import { z } from 'zod';
+
+// Loads `.env` when one is present, before anything reads `process.env`. A
+// missing file is not an error: in production the platform supplies the
+// environment, and `dotenv` leaves whatever is already set untouched.
+config({ quiet: true });
+
+/**
+ * The single source of truth for configuration. Every blueprint that needs an
+ * environment variable contributes its line to the region below, so the shape
+ * of `env` always matches `.env.example`.
+ */
+const schema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  // #region atarashi:env-schema
+  DATABASE_URL: z.string().min(1),
+  PORT: z.coerce.number().int().positive().default(3000),
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
+  JWT_EXPIRES_IN: z.string().default('7d'),
+  // #endregion
+});
+
+const parsed = schema.safeParse(process.env);
+
+if (!parsed.success) {
+  console.error('Invalid environment variables:');
+  for (const issue of parsed.error.issues) {
+    console.error(`  - ${issue.path.join('.') || '(root)'}: ${issue.message}`);
+  }
+  process.exit(1);
+}
+
+export const env = parsed.data;
+export type Env = typeof env;
+
+────────────────────────────────────────────────────────────────────────
+FILE src/db/client.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
+
+import Database from 'better-sqlite3';
+
+import { env } from '../config/env.js';
+
+/** `file:./data/app.db` and `./data/app.db` both mean the same local file. */
+const file = env.DATABASE_URL.replace(/^file:/, '');
+
+mkdirSync(dirname(file), { recursive: true });
+
+export const database = new Database(file);
+
+database.pragma('journal_mode = WAL');
+database.pragma('foreign_keys = ON');
+
+/** Fails fast at boot rather than on the first request. */
+export function checkDatabaseConnection() {
+  database.prepare('SELECT 1').get();
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/db/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+
+import { database } from './client.js';
+import * as schema from './schema.js';
+
+export const db = drizzle(database, { schema });
+
+export type Database = typeof db;
+
+────────────────────────────────────────────────────────────────────────
+FILE src/db/schema.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+
+/** A starter table. Delete it once you have a real one. */
+export const users = sqliteTable('users', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  email: text('email').notNull().unique(),
+  createdAt: integer('created_at', { mode: 'timestamp' })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }),
+});
+
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+
+────────────────────────────────────────────────────────────────────────
+FILE src/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+// #region atarashi:imports
+import { checkDatabaseConnection } from './db/client.js';
+import { app } from './app.js';
+import { env } from './config/env.js';
+
+// #endregion
+
+// #region atarashi:bootstrap
+checkDatabaseConnection();
+app.listen(env.PORT, () => {
+  console.log(`my-app listening on http://localhost:${env.PORT}`);
+});
+// #endregion
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/async-handler.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
+
+/**
+ * Wraps an async route handler so a rejected promise reaches the error
+ * middleware instead of becoming an unhandled rejection.
+ */
+export const asyncHandler =
+  (handler: RequestHandler): RequestHandler =>
+  (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(handler(req, res, next)).catch(next);
+  };
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/http.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import type { Response } from 'express';
+
+export const HttpStatus = Object.freeze({
+  OK: 200,
+  CREATED: 201,
+  NO_CONTENT: 204,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  CONFLICT: 409,
+  UNPROCESSABLE_ENTITY: 422,
+  TOO_MANY_REQUESTS: 429,
+  INTERNAL_SERVER_ERROR: 500,
+});
+
+export type HttpStatusCode = (typeof HttpStatus)[keyof typeof HttpStatus];
+
+export interface ApiSuccess<T> {
+  success: true;
+  data: T;
+}
+
+export interface ApiFailure {
+  success: false;
+  error: string;
+  details?: unknown;
+}
+
+export function sendSuccess<T>(res: Response, data: T, status: number = HttpStatus.OK) {
+  const body: ApiSuccess<T> = { success: true, data };
+  return res.status(status).json(body);
+}
+
+export function sendError(
+  res: Response,
+  error: string,
+  status: number = HttpStatus.INTERNAL_SERVER_ERROR,
+  details?: unknown,
+) {
+  const body: ApiFailure = { success: false, error, ...(details === undefined ? {} : { details }) };
+  return res.status(status).json(body);
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/jwt.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import jwt from 'jsonwebtoken';
+import type { SignOptions } from 'jsonwebtoken';
+
+import { env } from '../config/env.js';
+
+export interface TokenPayload {
+  /** The subject — normally the user id. */
+  sub: string;
+  [claim: string]: unknown;
+}
+
+export function signToken(payload: TokenPayload, options: SignOptions = {}): string {
+  return jwt.sign(payload, env.JWT_SECRET, {
+    expiresIn: env.JWT_EXPIRES_IN as SignOptions['expiresIn'],
+    ...options,
+  });
+}
+
+export function verifyToken(token: string): TokenPayload {
+  return jwt.verify(token, env.JWT_SECRET) as TokenPayload;
+}
+
+export function decodeToken(token: string): TokenPayload | null {
+  return jwt.decode(token) as TokenPayload | null;
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/lib/password.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import bcrypt from 'bcryptjs';
+
+const ROUNDS = 12;
+
+export function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, ROUNDS);
+}
+
+export function verifyPassword(password: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(password, hash);
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/middlewares/auth.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import type { NextFunction, Request, Response } from 'express';
+
+import { HttpStatus, sendError } from '../lib/http.js';
+import { verifyToken } from '../lib/jwt.js';
+import type { TokenPayload } from '../lib/jwt.js';
+
+export interface AuthenticatedRequest extends Request {
+  user?: TokenPayload;
+}
+
+/** Accepts `Authorization: Bearer <token>` first, then a `token` cookie. */
+export function requireAuth(req: Request, res: Response, next: NextFunction) {
+  const header = req.headers.authorization;
+  const bearer = header?.startsWith('Bearer ') ? header.slice('Bearer '.length) : undefined;
+  const token = bearer ?? (req.cookies?.token as string | undefined);
+
+  if (!token) {
+    sendError(res, 'Authentication required', HttpStatus.UNAUTHORIZED);
+    return;
+  }
+
+  try {
+    (req as AuthenticatedRequest).user = verifyToken(token);
+    next();
+  } catch {
+    sendError(res, 'Invalid or expired token', HttpStatus.UNAUTHORIZED);
+  }
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE src/routes/index.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { Router } from 'express';
+
+/** Mounted at `/api/v1`. Add your feature routers here. */
+export const router = Router();
+
+router.get('/', (_req, res) => {
+  res.json({ success: true, data: { name: 'my-app', version: 1 } });
+});
+
+────────────────────────────────────────────────────────────────────────
+FILE tests/health.test.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import request from 'supertest';
+import { describe, expect, it } from 'vitest';
+
+import { app } from '../src/app.js';
+
+describe('GET /health', () => {
+  it('reports the service as healthy', async () => {
+    const response = await request(app).get('/health');
+
+    expect(response.status).toBe(200);
+    expect(response.body.status).toBe('ok');
+  });
+});
+
+────────────────────────────────────────────────────────────────────────
+FILE tsconfig.json  (644)
+────────────────────────────────────────────────────────────────────────
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "src",
+    "outDir": "dist",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "verbatimModuleSyntax": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}
+
+────────────────────────────────────────────────────────────────────────
+FILE vitest.config.ts  (644)
+────────────────────────────────────────────────────────────────────────
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    environment: 'node',
+    // A new project has no tests yet; that is not a failure.
+    passWithNoTests: true,
+    include: ['tests/**/*.test.ts'],
+    coverage: {
+      provider: 'v8',
+      include: ['src/**'],
+      reporter: ['text', 'lcov'],
+    },
+  },
+});

@@ -1,0 +1,76 @@
+{
+    "manifestVersion": 1,
+    "id": "db/mongodb",
+    "name": "MongoDB",
+    "version": "1.0.0",
+    "description": "MongoDB connection with a startup ping and a Compose service; hands over to Mongoose when present.",
+    "category": "database",
+    "tags": ["mongodb", "nosql", "document", "database"],
+    "provides": ["database", "database:document", "database:mongodb"],
+    "conflicts": ["database"],
+    "requires": ["runtime:node", "config:env"],
+    "optionalPeers": ["orm/mongoose"],
+    "after": ["core/node-ts", "core/node-js", "validation/zod"],
+    "priority": 30,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "prompts": [
+        {
+            "name": "db.name",
+            "type": "input",
+            "message": "Database name",
+            "default": "{{ project.slug }}",
+            "flag": "--db-name",
+            "validate": {
+                "pattern": "^[a-z][a-z0-9_-]*$",
+                "message": "lowercase letters, digits, dashes and underscores"
+            }
+        }
+    ],
+    "files": [
+        {
+            "from": "files/src/db/client.ts.hbs",
+            "to": "src/db/client.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "when": "!provides('orm')"
+        },
+        {
+            "from": "files/docker-compose.yml.hbs",
+            "to": "docker-compose.yml",
+            "when": "has('infra/docker-compose')",
+            "merge": "yaml-deep"
+        }
+    ],
+    "dependencies": {
+        "mongodb": { "version": "^6.20.0", "when": "!provides('orm')" }
+    },
+    "scripts": {
+        "db:up": { "value": "docker compose up -d db", "when": "has('infra/docker-compose')" }
+    },
+    "env": [
+        {
+            "key": "MONGODB_URI",
+            "sample": "mongodb://localhost:27017/{{#when \"answers.db.name\"}}{{expr \"answers.db.name\"}}{{else}}{{ project.slug }}{{/when}}",
+            "description": "MongoDB connection string, including the database name",
+            "required": true
+        }
+    ],
+    "contributions": [
+        {
+            "target": "src/config/env.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "env-schema",
+            "value": "MONGODB_URI: z.string().min(1),"
+        },
+        {
+            "target": "src/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "imports",
+            "value": "import { connectDatabase } from './db/client.js';",
+            "when": "!provides('orm')"
+        },
+        {
+            "target": "src/index.{{#when \"provides('language:typescript')\"}}ts{{else}}js{{/when}}",
+            "slot": "bootstrap",
+            "value": "await connectDatabase();",
+            "when": "!provides('orm')"
+        }
+    ],
+    "nextSteps": ["Start MongoDB:  {{ pm.run }} db:up", "Set MONGODB_URI in .env"]
+}

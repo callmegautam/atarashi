@@ -1,0 +1,22 @@
+{
+    "manifestVersion": 1,
+    "id": "infra/docker-compose",
+    "name": "Docker Compose",
+    "version": "1.0.0",
+    "description": "A Compose file for the app that database blueprints extend with their own service and volume.",
+    "category": "infra",
+    "tags": ["docker", "compose", "infra"],
+    "provides": ["infra:compose"],
+    "requires": ["infra:docker"],
+    "after": ["infra/docker", "db/postgres", "db/mysql", "db/mongodb"],
+    "priority": 82,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "files": [
+        { "from": "files/docker-compose.yml.hbs", "to": "docker-compose.yml", "merge": "yaml-deep" }
+    ],
+    "scripts": {
+        "compose:up": "docker compose up --build -d",
+        "compose:down": "docker compose down"
+    },
+    "nextSteps": ["Bring the stack up:  {{ pm.run }} compose:up"]
+}

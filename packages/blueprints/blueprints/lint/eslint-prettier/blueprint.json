@@ -1,0 +1,46 @@
+{
+    "manifestVersion": 1,
+    "id": "lint/eslint-prettier",
+    "name": "ESLint + Prettier",
+    "version": "1.0.0",
+    "description": "Flat-config ESLint for correctness and Prettier for formatting, with the two kept from fighting.",
+    "category": "lint",
+    "tags": ["eslint", "prettier", "lint", "format"],
+    "provides": ["lint", "lint:eslint", "format"],
+    "conflicts": ["lint", "format"],
+    "requires": ["runtime:node"],
+    "priority": 90,
+    "engines": { "atarashi": ">=1.0.0-0 <2.0.0", "node": ">=20.11" },
+    "files": [
+        {
+            "from": "files/eslint.config.ts.mjs",
+            "to": "eslint.config.mjs",
+            "when": "provides('language:typescript')"
+        },
+        {
+            "from": "files/eslint.config.js.mjs",
+            "to": "eslint.config.mjs",
+            "when": "provides('language:javascript')"
+        },
+        { "from": "files/_prettierrc.json", "to": ".prettierrc.json" },
+        { "from": "files/_prettierignore", "to": ".prettierignore" }
+    ],
+    "devDependencies": {
+        "eslint": "^9.37.0",
+        "@eslint/js": "^9.37.0",
+        "eslint-config-prettier": "^10.1.8",
+        "prettier": "^3.6.2",
+        "typescript-eslint": {
+            "version": "^8.45.0",
+            "when": "provides('language:typescript')"
+        }
+    },
+    "scripts": {
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "format": "prettier --write .",
+        "format:check": "prettier --check ."
+    },
+    "gitignore": [".eslintcache"],
+    "nextSteps": ["Lint the project:  {{ pm.run }} lint"]
+}
