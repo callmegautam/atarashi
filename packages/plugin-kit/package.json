@@ -1,6 +1,6 @@
 {
     "name": "@atarashi/plugin-kit",
-    "version": "1.0.0-alpha.0",
+    "version": "1.0.0",
     "description": "Types and test helpers for third-party Atarashi blueprint authors.",
     "type": "module",
     "license": "MIT",
@@ -45,7 +45,6 @@
         "zod": "^3.25.76"
     },
     "publishConfig": {
-        "access": "public",
-        "provenance": true
+        "access": "public"
     }
 }

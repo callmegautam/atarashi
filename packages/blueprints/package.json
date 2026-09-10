@@ -1,6 +1,6 @@
 {
     "name": "@atarashi/blueprints",
-    "version": "1.0.0-alpha.0",
+    "version": "1.0.0",
     "description": "The first-party Atarashi blueprint collection.",
     "type": "module",
     "license": "MIT",
@@ -45,8 +45,7 @@
         "@atarashi/schema": "workspace:*"
     },
     "publishConfig": {
-        "access": "public",
-        "provenance": true
+        "access": "public"
     },
     "devDependencies": {
         "@atarashi/core": "workspace:*",

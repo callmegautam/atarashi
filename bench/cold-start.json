@@ -450,6 +450,31 @@
           "min": 276.145899
         }
       ]
+    },
+    {
+      "at": "2026-09-10T14:41:06.138Z",
+      "node": "v26.2.0",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 656.200759,
+          "p95": 696.382724,
+          "min": 412.367207
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 702.837855,
+          "p95": 856.442023,
+          "min": 505.415894
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 508.992466,
+          "p95": 524.752542,
+          "min": 394.633456
+        }
+      ]
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
     "name": "@atarashi/core",
-    "version": "1.0.0-alpha.0",
+    "version": "1.0.0",
     "description": "The Atarashi generation engine: resolve, render, merge, plan, write.",
     "type": "module",
     "license": "MIT",
@@ -48,7 +48,6 @@
         "@types/semver": "^7.7.1"
     },
     "publishConfig": {
-        "access": "public",
-        "provenance": true
+        "access": "public"
     }
 }
