@@ -1,3 +1,4 @@
+import { parseRegistryIndex } from '@atarashi/schema';
 import { describe, expect, it } from 'vitest';
 import { RegistryError } from '../src/errors.js';
 import {
@@ -67,5 +68,48 @@ describe('indexRootHash', () => {
         const tampered = structuredClone(base) as { entries: { version: string }[] };
         tampered.entries[0]!.version = '1.2.1';
         expect(indexRootHash(tampered as never)).not.toBe(indexRootHash(base));
+    });
+});
+
+describe('the root hash survives a schema parse', () => {
+    /**
+     * `IndexStore.parse` validates first and verifies second, so the digest is
+     * computed over the parsed document rather than the bytes that were served.
+     * Any field the publisher emits and the schema drops therefore fails every
+     * client's integrity check, with nothing in the CLI able to say why.
+     */
+    it('matches the digest the publisher computed over the raw document', () => {
+        const published = {
+            indexVersion: 1,
+            version: '1.4.2',
+            updatedAt: '2026-09-07T00:00:00.000Z',
+            entries: [
+                {
+                    id: 'db/postgres',
+                    kind: 'blueprint',
+                    name: 'PostgreSQL',
+                    version: '1.0.0',
+                    description: 'PostgreSQL connection with pooling.',
+                    category: 'database',
+                    tags: [],
+                    provides: ['database'],
+                    requires: [],
+                    conflicts: [],
+                    engines: { atarashi: '>=1.0.0 <2.0.0', node: '>=20.11' },
+                    experimental: false,
+                    deprecated: false,
+                    tarball: 'blueprints/db-postgres-1.0.0.tgz',
+                    integrity: 'sha256-3q2+7w==',
+                    bundled: false,
+                },
+            ],
+        };
+
+        const stated = indexRootHash(published as never);
+        const parsed = parseRegistryIndex({ ...published, integrity: stated });
+
+        expect(parsed.ok).toBe(true);
+        if (!parsed.ok) return;
+        expect(indexRootHash(parsed.value)).toBe(stated);
     });
 });
