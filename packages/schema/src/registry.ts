@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { enginesSchema } from './manifest.js';
 import {
     blueprintIdSchema,
     capabilitySchema,
@@ -23,7 +24,7 @@ export const registryEntrySchema = z.object({
     provides: z.array(capabilitySchema).default([]),
     requires: z.array(capabilitySchema).default([]),
     conflicts: z.array(capabilitySchema).default([]),
-    engines: z.object({ atarashi: semverRangeSchema.optional() }).default({}),
+    engines: enginesSchema.default({}),
     experimental: z.boolean().default(false),
     deprecated: z.boolean().default(false),
     /** Where the tarball lives, relative to the index URL or absolute. */

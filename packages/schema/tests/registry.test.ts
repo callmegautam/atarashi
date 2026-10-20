@@ -41,6 +41,24 @@ describe('registry index', () => {
         }
     );
 
+    it('keeps every engines range an entry declares', () => {
+        // The root hash is computed over the *parsed* index, so a field the
+        // publisher emits and the schema silently drops breaks integrity for
+        // every client. `engines.node` did exactly that.
+        const withEngines = index();
+        withEngines.entries = [
+            { ...entry(), engines: { atarashi: '>=1.0.0 <2.0.0', node: '>=20.11' } },
+        ] as never;
+
+        const result = parseRegistryIndex(withEngines);
+        expect(result.ok).toBe(true);
+        if (!result.ok) return;
+        expect(result.value.entries[0]?.engines).toEqual({
+            atarashi: '>=1.0.0 <2.0.0',
+            node: '>=20.11',
+        });
+    });
+
     it('rejects unknown top-level keys in the index', () => {
         expect(parseRegistryIndex({ ...index(), blueprints: [] }).ok).toBe(false);
     });
