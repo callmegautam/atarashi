@@ -1,5 +1,16 @@
 # atarashi
 
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @atarashi/schema@1.0.1
+  - @atarashi/blueprints@1.0.1
+  - @atarashi/core@1.0.1
+  - @atarashi/plugin-kit@1.0.1
+  - @atarashi/registry@1.0.1
+
 ## 1.0.0
 
 ### Minor Changes

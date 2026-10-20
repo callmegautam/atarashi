@@ -1,6 +1,6 @@
 {
     "name": "@atarashi/blueprints",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "The first-party Atarashi blueprint collection.",
     "type": "module",
     "license": "MIT",

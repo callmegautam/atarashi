@@ -1,6 +1,6 @@
 {
     "name": "@atarashi/plugin-kit",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Types and test helpers for third-party Atarashi blueprint authors.",
     "type": "module",
     "license": "MIT",

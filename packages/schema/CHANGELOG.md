@@ -1,5 +1,11 @@
 # @atarashi/schema
 
+## 1.0.1
+
+### Patch Changes
+
+- Registry entries now validate `engines` with the same schema as blueprint manifests instead of a narrower inline one.
+
 ## 1.0.0
 
 ### Minor Changes

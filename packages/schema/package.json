@@ -1,6 +1,6 @@
 {
     "name": "@atarashi/schema",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Zod schemas and types for the Atarashi project spec, blueprint manifests and registry index.",
     "type": "module",
     "license": "MIT",

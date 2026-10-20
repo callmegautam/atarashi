@@ -1,6 +1,6 @@
 {
     "name": "@atarashi/registry",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Blueprint registry: fetch, verify, cache, pin and load blueprints.",
     "type": "module",
     "license": "MIT",
