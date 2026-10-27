@@ -1,6 +1,17 @@
 import { realpathSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { ADD_FLAGS, ADD_HELP, NEW_FLAGS, NEW_HELP } from './command-flags.js';
+import {
+    ADD_FLAGS,
+    ADD_HELP,
+    NEW_FLAGS,
+    NEW_HELP,
+    REMOVE_FLAGS,
+    REMOVE_HELP,
+    STATUS_FLAGS,
+    STATUS_HELP,
+    UPDATE_FLAGS,
+    UPDATE_HELP,
+} from './command-flags.js';
 import { runAdd } from './commands/add.js';
 import { runCompletion } from './commands/completion.js';
 import { runConfig } from './commands/config.js';
@@ -12,6 +23,9 @@ import { runList } from './commands/list.js';
 import { runNew } from './commands/new.js';
 import { runPreset } from './commands/preset.js';
 import { runRegistry } from './commands/registry.js';
+import { runRemove } from './commands/remove.js';
+import { runStatus } from './commands/status.js';
+import { runUpdate } from './commands/update.js';
 import { runUpgrade } from './commands/upgrade.js';
 import { cliVersion } from './engine.js';
 import { EXIT } from './exit-codes.js';
@@ -74,6 +88,9 @@ Usage
   atarashi                                  Interactive wizard
   atarashi new <name> [options]             Create a project
   atarashi add <blueprint...> [options]     Add capabilities to an existing project
+  atarashi remove <blueprint...> [options]  Take blueprints back out of a project
+  atarashi update [options]                 Re-apply newer blueprint versions as a diff
+  atarashi status                           Drift since generation, and pending updates
   atarashi list [blueprints|presets]        Browse what's available
   atarashi info <blueprint>                 Details for one blueprint
   atarashi preset <save|list|delete>        Save/list/delete personal presets
@@ -85,9 +102,17 @@ Usage
   atarashi upgrade                          Check for a newer atarashi
   atarashi completion <bash|zsh|fish>       Shell completions
 
-Run \`atarashi new --help\` or \`atarashi add --help\` for their full flag surface.
+Run \`atarashi <command> --help\` for the full flag surface of new, add,
+remove, update and status.
 Every command that changes something accepts \`--dry-run\`.
 `;
+
+function unknownOptions(unknown: string[], command: string): number {
+    process.stderr.write(
+        `Unknown option(s): ${unknown.join(' ')}\n\nRun \`atarashi ${command} --help\` for usage.\n`
+    );
+    return EXIT.USAGE;
+}
 
 function hasHelpFlag(args: string[]): boolean {
     return args.includes('--help') || args.includes('-h');
@@ -122,6 +147,36 @@ async function dispatch(argv: string[]): Promise<number> {
             }
             const { opts, positionals, unknown } = parseRawArgs(rest, ADD_FLAGS);
             return runAdd(positionals, unknown, opts as never);
+        }
+
+        case 'remove': {
+            if (hasHelpFlag(rest)) {
+                process.stdout.write(REMOVE_HELP);
+                return EXIT.OK;
+            }
+            const { opts, positionals, unknown } = parseRawArgs(rest, REMOVE_FLAGS);
+            if (unknown.length > 0) return unknownOptions(unknown, 'remove');
+            return runRemove(positionals, opts as never);
+        }
+
+        case 'update': {
+            if (hasHelpFlag(rest)) {
+                process.stdout.write(UPDATE_HELP);
+                return EXIT.OK;
+            }
+            const { opts, unknown } = parseRawArgs(rest, UPDATE_FLAGS);
+            if (unknown.length > 0) return unknownOptions(unknown, 'update');
+            return runUpdate(opts as never);
+        }
+
+        case 'status': {
+            if (hasHelpFlag(rest)) {
+                process.stdout.write(STATUS_HELP);
+                return EXIT.OK;
+            }
+            const { opts, unknown } = parseRawArgs(rest, STATUS_FLAGS);
+            if (unknown.length > 0) return unknownOptions(unknown, 'status');
+            return runStatus(opts as never);
         }
 
         case 'list': {
