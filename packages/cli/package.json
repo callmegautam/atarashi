@@ -1,6 +1,6 @@
 {
     "name": "atarashi",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "description": "Composable project scaffolding. Describe capabilities; get a project that runs.",
     "type": "module",
     "license": "MIT",
