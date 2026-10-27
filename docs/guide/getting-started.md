@@ -98,6 +98,11 @@ slot regions: those `// #region atarashi:imports` comments in your source. Files
 you have edited by hand since generation are never overwritten silently; you get
 a diff and a choice.
 
+The other direction works too. `atarashi remove auth/jwt` takes a blueprint back
+out, `atarashi update` brings in newer blueprint versions, and `atarashi status`
+tells you what changed since generation. See
+[Recipes](./recipes.md#remove-a-blueprint-from-an-existing-project).
+
 ## Where things are
 
 | You want | Read |
