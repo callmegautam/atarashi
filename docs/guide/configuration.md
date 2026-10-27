@@ -82,8 +82,15 @@ Useful in CI, where you want the settings without a config file on disk.
 ## A project's own config
 
 Every generated project gets an `atarashi.json` recording the spec it came from:
-the blueprints, the answers, and the options. It is what makes `atarashi add`
-possible later, and regenerating from it reproduces the project byte for byte.
+the blueprints, the answers, and the options. It is what makes `atarashi add`,
+`remove`, `update` and `status` possible later, and regenerating from it
+reproduces the project byte for byte.
+
+Those three compare your files against the render `atarashi.json` describes, at
+the blueprint versions it recorded. A project written by an older atarashi
+needs that release's first-party blueprints for this; the CLI fetches
+`@atarashi/blueprints` at the matching version from npm once, verifies its
+integrity, and caches it under the cache directory's `baselines/` folder.
 
 Commit it. The one thing it does not contain is anything secret: values that
 belong in `.env` stay in `.env`.

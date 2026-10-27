@@ -27,6 +27,59 @@ If a file you have edited by hand is in the way, you get a diff and a choice
 rather than a silent overwrite. Keep the `// #region atarashi:…` markers intact
 and the splice keeps working no matter how much else you change around them.
 
+## Remove a blueprint from an existing project
+
+```bash
+atarashi remove auth/jwt --dry-run   # see the diff first
+atarashi remove auth/jwt
+```
+
+Atarashi renders the project with and without the blueprint, at the versions
+`atarashi.json` recorded, and applies the difference: the blueprint's own files
+are deleted, and its lines leave the files it shared with others (`app.ts`,
+`package.json`, `.env.example`, the README). Its prompt answers leave
+`atarashi.json`. When `package.json` changed, dependencies are re-installed
+unless you pass `--no-install`.
+
+Your edits survive. A shared file you changed is merged three ways, and
+`package.json` is merged key by key, so a dependency you added yourself stays.
+A file the blueprint owned that you edited is left in place and reported, not
+deleted. Anything that cannot be merged is printed with the change it would have
+made, and the command exits `4`.
+
+It refuses when something that stays still needs what you are removing:
+
+```text
+$ atarashi remove db/postgres
+✖ orm/drizzle requires `database:sql`, which only db/postgres provides
+    → Remove both: `atarashi remove db/postgres orm/drizzle`
+```
+
+After a removal it also points at blueprints that were probably only there for
+the one you removed, so you can take those out too.
+
+## Keep a project up to date with newer blueprints
+
+```bash
+atarashi status             # what you edited, which blueprints have newer versions
+atarashi update --dry-run   # the full diff, written nowhere
+atarashi update
+```
+
+`update` treats what `atarashi.json` generated as the base, the current
+blueprints as the target and your files as they are now, then decides per file:
+
+| Your copy | What happens |
+|---|---|
+| untouched since generation | replaced with the new version |
+| edited, not where the blueprint changed | merged; your edits stay |
+| edited where the blueprint changed too | left alone; the change is printed for you to apply |
+| deleted | stays deleted |
+
+`atarashi.json` then records the new versions, so the next `status` is clean.
+A newer blueprint that introduces a prompt gets its default; pass `--set` to
+choose otherwise. Run `update` on a clean git tree, so `git diff` is the review.
+
 ## Use it in CI
 
 Generation is deterministic and non-interactive when you ask it to be. In a
@@ -139,8 +192,8 @@ atarashi new my-api --preset backend-ts \
   --remove obs/pino            --add obs/morgan-logger
 ```
 
-The same works after the fact with `atarashi add`, though removing a blueprint
-from an existing project is not automated; the files it wrote are yours now.
+The same works after the fact: `atarashi remove lint/eslint-prettier` and then
+`atarashi add lint/biome`.
 
 ## Run a database locally
 

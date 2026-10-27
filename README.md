@@ -35,11 +35,16 @@ Atarashi records the decisions instead of the output:
 atarashi new my-api --http fastify --db postgres --orm drizzle --auth jwt
 cd my-api
 atarashi add obs/pino          # three weeks later, in the same project
+atarashi remove auth/jwt       # changed your mind
+atarashi update                # pick up newer blueprint versions
 ```
 
 `atarashi add` re-renders what the new blueprint would have contributed and
-splices it into your existing files at the slot regions. Files you have edited by
-hand are never silently overwritten.
+splices it into your existing files at the slot regions. `remove` takes a
+blueprint back out, and `update` re-applies newer blueprint versions as a diff
+you can review first. All three merge around your edits; files you have edited
+by hand are never silently overwritten. `atarashi status` shows what you changed
+since generation and what an update would touch.
 
 ## Install
 
@@ -124,6 +129,9 @@ capability, and it is the whole reason the system is built this way.
 atarashi                                  Interactive wizard
 atarashi new <name> [options]             Create a project
 atarashi add <blueprint...>               Add capabilities to an existing project
+atarashi remove <blueprint...>            Take blueprints back out of a project
+atarashi update                           Re-apply newer blueprint versions as a diff
+atarashi status                           Drift since generation, and pending updates
 atarashi list [blueprints|presets]        Browse what's available
 atarashi info <blueprint>                 Details for one blueprint
 atarashi preset <save|list|delete>        Personal presets

@@ -10,13 +10,14 @@ import {
     resolve as resolveGraph,
     runActions,
 } from '@atarashi/core';
-import { type ProjectSpec, parseProjectConfig, type SelectedBlueprint } from '@atarashi/schema';
+import type { ProjectSpec, SelectedBlueprint } from '@atarashi/schema';
 import { formatDiff, lineDiff } from '../diff.js';
 import { buildEngineDeps } from '../engine.js';
 import { CliUsageError, reportError } from '../errors.js';
 import { EXIT } from '../exit-codes.js';
 import { partitionNpmSpecs, resolveNpmBlueprintIds } from '../npm-blueprints.js';
 import { bytes, Printer, printDiagnostics } from '../output.js';
+import { readProjectConfig, specFromConfig } from '../project.js';
 import { collectPrompts, fillDefaults, parseDeclaredFlags } from '../prompts.js';
 import { buildRegistry } from '../registry-context.js';
 import { readUserConfig, resolveConfigPath } from '../user-config.js';
@@ -104,19 +105,7 @@ export async function runAdd(ids: string[], extra: string[], flags: AddFlags): P
             ]);
         }
 
-        const configPath = join(cwd, 'atarashi.json');
-        if (!existsSync(configPath)) {
-            throw new CliUsageError('No `atarashi.json` in this directory', [
-                'Run `atarashi new` first, or `cd` into a generated project',
-            ]);
-        }
-
-        const configResult = parseProjectConfig(
-            JSON.parse(await readFile(configPath, 'utf8')),
-            configPath
-        );
-        if (!configResult.ok) throw configResult.error;
-        const config = configResult.value;
+        const config = await readProjectConfig(cwd);
 
         const userConfig = await readUserConfig(resolveConfigPath());
         // See `new` — a `npm:` argument names a package, and the registry has to
@@ -143,32 +132,7 @@ export async function runAdd(ids: string[], extra: string[], flags: AddFlags): P
             return EXIT.OK;
         }
 
-        const oldSpec: ProjectSpec = {
-            specVersion: config.specVersion,
-            name: config.name,
-            description: config.description,
-            registry: config.registry,
-            preset: config.preset,
-            blueprints: config.blueprints.map(
-                (blueprint): SelectedBlueprint => ({
-                    id: blueprint.id,
-                    reason: 'user',
-                })
-            ),
-            answers: config.answers,
-            options: {
-                packageManager: 'pnpm',
-                git: true,
-                install: true,
-                format: true,
-                initialCommit: true,
-                license: 'MIT',
-                author: null,
-                writeEnv: false,
-                force: false,
-                ...config.options,
-            },
-        };
+        const oldSpec = specFromConfig(config);
 
         let newSpec: ProjectSpec = {
             ...oldSpec,

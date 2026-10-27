@@ -49,7 +49,8 @@
         "@atarashi/schema": "workspace:*",
         "@clack/prompts": "^0.11.0",
         "commander": "^14.0.2",
-        "picocolors": "^1.1.1"
+        "picocolors": "^1.1.1",
+        "semver": "^7.8.5"
     },
     "keywords": [
         "atarashi",
@@ -61,5 +62,8 @@
     ],
     "publishConfig": {
         "access": "public"
+    },
+    "devDependencies": {
+        "@types/semver": "^7.8.0"
     }
 }

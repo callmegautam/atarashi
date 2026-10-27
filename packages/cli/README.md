@@ -44,6 +44,9 @@ Run `atarashi` with no arguments for the interactive wizard, or
 atarashi                                  Interactive wizard
 atarashi new <name> [options]             Create a project
 atarashi add <blueprint...> [options]     Add capabilities to an existing project
+atarashi remove <blueprint...> [options]  Take blueprints back out of a project
+atarashi update [options]                 Re-apply newer blueprint versions as a diff
+atarashi status                           Drift since generation, and pending updates
 atarashi list [blueprints|presets]        Browse what's available
 atarashi info <blueprint>                 Details for one blueprint
 atarashi preset <save|list|delete>        Save/list/delete personal presets
@@ -71,6 +74,15 @@ atarashi add auth/jwt
 Atarashi renders what the new blueprint contributes and splices it into the slot
 regions in your source. Files you have edited by hand since generation are never
 overwritten silently; you get a diff and a choice.
+
+The same record lets a project change direction or catch up:
+
+```bash
+atarashi status              # what you edited, what is out of date
+atarashi remove auth/jwt     # files, dependencies, env vars and answers go
+atarashi update --dry-run    # review newer blueprint versions as a diff
+atarashi update
+```
 
 ## What you can rely on
 

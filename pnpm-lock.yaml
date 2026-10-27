@@ -90,6 +90,13 @@ importers:
       picocolors:
         specifier: ^1.1.1
         version: 1.1.1
+      semver:
+        specifier: ^7.8.5
+        version: 7.8.5
+    devDependencies:
+      '@types/semver':
+        specifier: ^7.8.0
+        version: 7.8.0
 
   packages/core:
     dependencies:

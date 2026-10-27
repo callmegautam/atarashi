@@ -120,3 +120,81 @@ export const ADD_HELP = `Usage: atarashi add <blueprint...> [options]
   -q, --quiet
   --no-color
 `;
+
+const LIFECYCLE_FLAGS: FlagSpec[] = [
+    { flag: '--yes', alias: '-y', takesValue: false },
+    { flag: '--dry-run', takesValue: false },
+    { flag: '--json', takesValue: false },
+    { flag: '--offline', takesValue: false },
+    { flag: '--registry', takesValue: true },
+    { flag: '--install', takesValue: false },
+    { flag: '--no-install', takesValue: false },
+    { flag: '--verbose', alias: '-v', takesValue: false },
+    { flag: '--quiet', alias: '-q', takesValue: false },
+    { flag: '--no-color', takesValue: false },
+    { flag: '--help', alias: '-h', takesValue: false },
+];
+
+export const REMOVE_FLAGS: FlagSpec[] = LIFECYCLE_FLAGS;
+
+export const UPDATE_FLAGS: FlagSpec[] = [
+    { flag: '--set', takesValue: true, collect: true },
+    ...LIFECYCLE_FLAGS,
+];
+
+export const STATUS_FLAGS: FlagSpec[] = [
+    { flag: '--json', takesValue: false },
+    { flag: '--offline', takesValue: false },
+    { flag: '--registry', takesValue: true },
+    { flag: '--no-color', takesValue: false },
+    { flag: '--help', alias: '-h', takesValue: false },
+];
+
+export const REMOVE_HELP = `Usage: atarashi remove <blueprint...> [options]
+
+Takes blueprints out of the project: their files, their dependencies, their
+slot contributions and their answers. Refuses when a blueprint that stays
+still needs one being removed. Files edited since generation are merged when
+the edits do not overlap, and otherwise left alone and reported.
+
+  -y, --yes                  Never prompt for confirmation
+  --dry-run                  Show the diff; write nothing
+  --json                     Machine-readable output
+  --offline                  Use cached blueprints only
+  --registry <version|url>   Pin the registry for this run
+  --install / --no-install   Re-install when package.json changed (default: as generated)
+  -v, --verbose
+  -q, --quiet
+  --no-color
+`;
+
+export const UPDATE_HELP = `Usage: atarashi update [options]
+
+Re-applies newer blueprint versions to the project. The baseline is what
+atarashi.json generated: files untouched since then are replaced, edited
+files are merged three ways, and changes that overlap your edits are
+printed and left for you to apply.
+
+  --set <key=value...>       Answer a prompt a newer blueprint introduced
+  -y, --yes                  Never prompt for confirmation
+  --dry-run                  Show the diff; write nothing
+  --json                     Machine-readable output
+  --offline                  Use cached blueprints only
+  --registry <version|url>   Pin the registry for this run
+  --install / --no-install   Re-install when package.json changed (default: as generated)
+  -v, --verbose
+  -q, --quiet
+  --no-color
+`;
+
+export const STATUS_HELP = `Usage: atarashi status [options]
+
+Shows the blueprints the project was generated from, which have newer
+versions, which generated files were edited or deleted since, and how many
+files \`atarashi update\` would touch.
+
+  --json                     Machine-readable output
+  --offline                  Use cached blueprints only
+  --registry <version|url>   Pin the registry for this run
+  --no-color
+`;

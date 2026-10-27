@@ -5,6 +5,9 @@ import { Printer } from '../output.js';
 const COMMANDS = [
     'new',
     'add',
+    'remove',
+    'update',
+    'status',
     'list',
     'info',
     'preset',
@@ -16,6 +19,10 @@ const COMMANDS = [
     'upgrade',
     'completion',
 ].join(' ');
+
+/** The blueprints of the project in the current directory, one per line: what `remove` can take. */
+const PROJECT_IDS =
+    "try{console.log(require('./atarashi.json').blueprints.map(b=>b.id).join(String.fromCharCode(10)))}catch(e){}";
 
 const bash = `# atarashi bash completion — eval "$(atarashi completion bash)"
 _atarashi_completions() {
@@ -29,6 +36,11 @@ _atarashi_completions() {
         add|info)
             local ids
             ids=$(atarashi list --json 2>/dev/null | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{process.stdout.write(JSON.parse(d).blueprints.map(b=>b.id).join(' '))}catch(e){}})" 2>/dev/null)
+            COMPREPLY=( $(compgen -W "$ids" -- "$cur") )
+            ;;
+        remove)
+            local ids
+            ids=$(node -e "${PROJECT_IDS}" 2>/dev/null)
             COMPREPLY=( $(compgen -W "$ids" -- "$cur") )
             ;;
     esac
@@ -52,6 +64,11 @@ _atarashi() {
         ids=(\${(f)"$(atarashi list --json 2>/dev/null | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{console.log(JSON.parse(d).blueprints.map(b=>b.id).join('\\\\n'))}catch(e){}})" 2>/dev/null)"})
         _describe 'blueprint' ids
     fi
+    if [[ \${words[2]} == remove ]]; then
+        local -a ids
+        ids=(\${(f)"$(node -e "${PROJECT_IDS}" 2>/dev/null)"})
+        _describe 'blueprint' ids
+    fi
 }
 _atarashi
 `;
@@ -61,6 +78,7 @@ complete -c atarashi -f
 ${COMMANDS.split(' ')
     .map((command) => `complete -c atarashi -n "__fish_use_subcommand" -a "${command}"`)
     .join('\n')}
+complete -c atarashi -n "__fish_seen_subcommand_from remove" -a "(node -e "${PROJECT_IDS}" 2>/dev/null)"
 complete -c atarashi -n "__fish_seen_subcommand_from add info" -a "(atarashi list --json 2>/dev/null | node -e 'let d=\\'\\';process.stdin.on(\\'data\\',c=>d+=c);process.stdin.on(\\'end\\',()=>{try{console.log(JSON.parse(d).blueprints.map(b=>b.id).join(\\'\\\\n\\'))}catch(e){}})' 2>/dev/null)"
 `;
 

@@ -15,6 +15,9 @@ Usage
   atarashi                                  Interactive wizard
   atarashi new <name> [options]             Create a project
   atarashi add <blueprint...> [options]     Add capabilities to an existing project
+  atarashi remove <blueprint...> [options]  Take blueprints back out of a project
+  atarashi update [options]                 Re-apply newer blueprint versions as a diff
+  atarashi status                           Drift since generation, and pending updates
   atarashi list [blueprints|presets]        Browse what's available
   atarashi info <blueprint>                 Details for one blueprint
   atarashi preset <save|list|delete>        Save/list/delete personal presets
@@ -26,7 +29,8 @@ Usage
   atarashi upgrade                          Check for a newer atarashi
   atarashi completion <bash|zsh|fish>       Shell completions
 
-Run `atarashi new --help` or `atarashi add --help` for their full flag surface.
+Run `atarashi <command> --help` for the full flag surface of new, add,
+remove, update and status.
 Every command that changes something accepts `--dry-run`.
 ```
 
@@ -95,6 +99,64 @@ Usage: atarashi add <blueprint...> [options]
   --install / --no-install
   -v, --verbose
   -q, --quiet
+  --no-color
+```
+
+### `atarashi remove`
+
+```text
+Usage: atarashi remove <blueprint...> [options]
+
+Takes blueprints out of the project: their files, their dependencies, their
+slot contributions and their answers. Refuses when a blueprint that stays
+still needs one being removed. Files edited since generation are merged when
+the edits do not overlap, and otherwise left alone and reported.
+
+  -y, --yes                  Never prompt for confirmation
+  --dry-run                  Show the diff; write nothing
+  --json                     Machine-readable output
+  --offline                  Use cached blueprints only
+  --registry <version|url>   Pin the registry for this run
+  --install / --no-install   Re-install when package.json changed (default: as generated)
+  -v, --verbose
+  -q, --quiet
+  --no-color
+```
+
+### `atarashi update`
+
+```text
+Usage: atarashi update [options]
+
+Re-applies newer blueprint versions to the project. The baseline is what
+atarashi.json generated: files untouched since then are replaced, edited
+files are merged three ways, and changes that overlap your edits are
+printed and left for you to apply.
+
+  --set <key=value...>       Answer a prompt a newer blueprint introduced
+  -y, --yes                  Never prompt for confirmation
+  --dry-run                  Show the diff; write nothing
+  --json                     Machine-readable output
+  --offline                  Use cached blueprints only
+  --registry <version|url>   Pin the registry for this run
+  --install / --no-install   Re-install when package.json changed (default: as generated)
+  -v, --verbose
+  -q, --quiet
+  --no-color
+```
+
+### `atarashi status`
+
+```text
+Usage: atarashi status [options]
+
+Shows the blueprints the project was generated from, which have newer
+versions, which generated files were edited or deleted since, and how many
+files `atarashi update` would touch.
+
+  --json                     Machine-readable output
+  --offline                  Use cached blueprints only
+  --registry <version|url>   Pin the registry for this run
   --no-color
 ```
 

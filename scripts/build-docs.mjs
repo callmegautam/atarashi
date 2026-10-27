@@ -79,6 +79,9 @@ function cliReference() {
     const commands = [
         ['atarashi new', ['new', '--help']],
         ['atarashi add', ['add', '--help']],
+        ['atarashi remove', ['remove', '--help']],
+        ['atarashi update', ['update', '--help']],
+        ['atarashi status', ['status', '--help']],
     ];
 
     const sections = commands
