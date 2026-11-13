@@ -575,6 +575,31 @@
           "min": 263.54856
         }
       ]
+    },
+    {
+      "at": "2026-10-27T14:47:09.711Z",
+      "node": "v24.22.1",
+      "platform": "linux-x64",
+      "results": [
+        {
+          "scenario": "new --preset backend-ts",
+          "median": 435.274028,
+          "p95": 569.416177,
+          "min": 328.667327
+        },
+        {
+          "scenario": "new --preset fullstack-react",
+          "median": 459.202299,
+          "p95": 693.635938,
+          "min": 350.674224
+        },
+        {
+          "scenario": "new core/node-ts",
+          "median": 396.437719,
+          "p95": 475.947937,
+          "min": 311.07117
+        }
+      ]
     }
   ]
 }
