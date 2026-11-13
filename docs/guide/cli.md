@@ -91,7 +91,6 @@ Usage: atarashi add <blueprint...> [options]
 
   --set <key=value...>       Answer a prompt by name
   -y, --yes                  Never prompt for confirmation
-  --force                    Overwrite files edited since generation too
   --dry-run                  Show the diff; write nothing
   --json                     Machine-readable output
   --offline                  Use cached registry only

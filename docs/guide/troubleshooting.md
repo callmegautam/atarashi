@@ -103,8 +103,8 @@ cp .env.example .env
 
 It compares what the file should look like against what is on disk. If you have
 edited it, it will not silently overwrite your work. Your options, in order of
-preference: merge the shown diff by hand; keep the slot region markers intact so
-future adds can splice cleanly; or `--force`.
+preference: merge the shown diff by hand, or keep the slot region markers intact
+so future adds can splice cleanly.
 
 Those `// #region atarashi:imports` comments are load-bearing. Delete them and
 `atarashi add` loses its insertion point and falls back to reporting a conflict.

@@ -27,7 +27,6 @@ export interface AddFlags {
     dryRun?: boolean;
     yes?: boolean;
     json?: boolean;
-    force?: boolean;
     offline?: boolean;
     registry?: string;
     set?: string[];
