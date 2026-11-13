@@ -151,13 +151,7 @@ export class Registry implements BlueprintSource {
             try {
                 return await layer.source.loadEntry(entry);
             } catch (thrown) {
-                if (
-                    thrown instanceof RegistryError &&
-                    thrown.code === DIAGNOSTIC_CODES.INTEGRITY_MISMATCH
-                ) {
-                    throw thrown;
-                }
-                if (!bundled) throw thrown;
+                if (isIntegrityFailure(thrown) || !bundled) throw thrown;
                 break; // fall back to the bundled copy
             }
         }
@@ -175,11 +169,17 @@ export class Registry implements BlueprintSource {
     async loadPreset(id: string): Promise<PresetManifest | undefined> {
         const local = await this.local.loadPreset(id);
         if (local) return local;
+        const bundled = await this.bundled?.source.loadPreset(id);
         for (const layer of this.remotes) {
-            const preset = await layer.source.loadPreset(id);
-            if (preset) return preset;
+            try {
+                const preset = await layer.source.loadPreset(id);
+                if (preset) return preset;
+            } catch (thrown) {
+                if (isIntegrityFailure(thrown) || !bundled) throw thrown;
+                break; // fall back to the bundled copy, e.g. offline with an uncached tarball
+            }
         }
-        return this.bundled?.source.loadPreset(id);
+        return bundled;
     }
 
     /** Every preset visible from every layer, deduplicated by precedence — `atarashi list presets`. */
@@ -194,8 +194,12 @@ export class Registry implements BlueprintSource {
             const presetEntries =
                 loaded?.index.entries.filter((entry) => entry.kind === 'preset') ?? [];
             for (const entry of presetEntries) {
-                const preset = await layer.source.loadPreset(entry.id);
-                if (preset) merged.set(preset.id, preset);
+                try {
+                    const preset = await layer.source.loadPreset(entry.id);
+                    if (preset) merged.set(preset.id, preset);
+                } catch (thrown) {
+                    if (isIntegrityFailure(thrown)) throw thrown;
+                }
             }
         }
 
@@ -300,6 +304,9 @@ export class Registry implements BlueprintSource {
         return this;
     }
 }
+
+const isIntegrityFailure = (thrown: unknown): boolean =>
+    thrown instanceof RegistryError && thrown.code === DIAGNOSTIC_CODES.INTEGRITY_MISMATCH;
 
 const isNewer = (candidate: string, incumbent: string): boolean =>
     valid(candidate) && valid(incumbent) ? gt(candidate, incumbent) : false;

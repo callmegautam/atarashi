@@ -297,6 +297,60 @@ describe('offline', () => {
     });
 });
 
+describe('presets offline', () => {
+    it('falls back to the bundled preset when the index is cached but the preset is not', async () => {
+        const { cwd, cacheDir, bundledDir } = await fixture();
+        const preset = {
+            manifestVersion: 1,
+            kind: 'preset',
+            id: 'preset/backend-minimal',
+            name: 'Minimal',
+            version: '1.0.0',
+            description: 'Fixture preset',
+            tags: [],
+            blueprints: ['core/node-ts'],
+            answers: {},
+        };
+        const { mkdir, writeFile } = await import('node:fs/promises');
+        await mkdir(join(bundledDir, 'presets'), { recursive: true });
+        await writeFile(
+            join(bundledDir, 'presets', 'backend-minimal.json'),
+            JSON.stringify(preset)
+        );
+        const presetDir = await tempDir();
+        await writeFile(join(presetDir, 'preset.json'), JSON.stringify(preset));
+
+        const { impl } = stubFetch(
+            makeIndex([
+                {
+                    id: 'preset/backend-minimal',
+                    kind: 'preset',
+                    tarball: await packDir(presetDir),
+                },
+            ])
+        );
+        // Online run that caches the index only.
+        await createRegistry({ cwd, cacheDir, bundledDir, url: URL_, fetchImpl: impl }).update();
+
+        const offline = createRegistry({
+            cwd,
+            cacheDir,
+            bundledDir,
+            url: URL_,
+            offline: true,
+            fetchImpl: async () => {
+                throw new Error('the network must not be touched offline');
+            },
+        });
+        expect((await offline.loadPreset('preset/backend-minimal'))?.id).toBe(
+            'preset/backend-minimal'
+        );
+        expect((await offline.presets()).map((entry) => entry.id)).toEqual([
+            'preset/backend-minimal',
+        ]);
+    });
+});
+
 describe('pinning and maintenance', () => {
     it('reports the exact version and root hash a run resolved against', async () => {
         const { cwd, cacheDir, bundledDir } = await fixture();
