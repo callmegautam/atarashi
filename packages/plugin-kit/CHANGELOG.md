@@ -1,5 +1,12 @@
 # @atarashi/plugin-kit
 
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies [940c495]
+  - @atarashi/registry@1.0.2
+
 ## 1.0.1
 
 ### Patch Changes
